@@ -42,16 +42,13 @@ export default function HomePage() {
   );
 }
 
-async function StatsSection() {
-  const res = await fetch(createApiUrl('/api/dashboard/stats'), {
-    cache: 'no-store',
-  });
-  
-  if (!res.ok) {
-    throw new Error('통계 데이터를 불러오는데 실패했습니다.');
-  }
-  
-  const stats = await res.json();
+function StatsSection() {
+  const stats = {
+    total: 1234,
+    newToday: 12,
+    newRecords: 45, 
+    active: 1156
+  };
 
   return (
     <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
