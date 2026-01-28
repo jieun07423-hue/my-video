@@ -34,5 +34,5 @@ jobs:
         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
         working-directory: ./
         vercel-args: '--prod'
-        # For static export
+        # For static export compatibility
         scope: 'vercel-cli*'
