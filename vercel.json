@@ -2,11 +2,5 @@
   "trailingSlash": true,
   "images": {
     "unoptimized": true
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+  }
 }
