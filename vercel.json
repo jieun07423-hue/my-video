@@ -1,8 +1,17 @@
 {
-  "trailingSlash": true,
-  "images": {
-    "unoptimized": true
-  },
+  "buildCommand": "npm run build",
+  "outputDirectory": "out",
   "cleanUrls": true,
-  "framework": "nextjs"
+  "trailingSlash": true,
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "regions": ["sin1"],
+  "functions": {},
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
