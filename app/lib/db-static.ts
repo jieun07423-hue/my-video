@@ -1,4 +1,5 @@
 import { dbLogger, syncLogger } from '@/app/lib/logger';
+import type { CreateBusinessInput, SearchOptions } from '@/app/lib/repositories/business.repository';
 
 const mockBusinesses = [
   {
@@ -76,14 +77,14 @@ const mockBusinesses = [
 ];
 
 class StaticBusinessRepository {
-  async createMany(data: any[]) {
+  async createMany(data: CreateBusinessInput[]) {
     dbLogger.info({ count: data.length }, '소상공인 대량 생성 시작');
     const result = { count: data.length };
     dbLogger.info({ created: result.count }, '소상공인 대량 생성 완료');
     return result;
   }
 
-  async search(options: any = {}) {
+  async search(options: SearchOptions = {}) {
     const { search, status, recordStatus, businessCode, page = 1, limit = 20 } = options;
     let filtered = [...mockBusinesses];
 
@@ -127,7 +128,7 @@ class StaticBusinessRepository {
     return mockBusinesses.find(b => b.id === id) || null;
   }
 
-  async upsertMany(data: any[]) {
+  async upsertMany(data: CreateBusinessInput[]) {
     return data.map(item => ({ ...item, id: item.bizesId }));
   }
 
@@ -183,23 +184,23 @@ class StaticSyncStateRepository {
 
 export const db = {
   business: {
-    createMany: (data: any) => Promise.resolve({ count: data.data?.length || 0 }),
-    findMany: (options: any) => Promise.resolve([]),
-    findUnique: (options: any) => Promise.resolve(null),
-    count: (options: any) => Promise.resolve(0),
-    upsert: (data: any) => Promise.resolve({ id: 'mock' }),
-    update: (data: any) => Promise.resolve({ id: 'mock' }),
+    createMany: (data: { data: CreateBusinessInput[] }) => Promise.resolve({ count: data.data?.length || 0 }),
+    findMany: (options: Record<string, unknown>) => Promise.resolve([]),
+    findUnique: (options: Record<string, unknown>) => Promise.resolve(null),
+    count: (options: Record<string, unknown>) => Promise.resolve(0),
+    upsert: (data: Record<string, unknown>) => Promise.resolve({ id: 'mock' }),
+    update: (data: Record<string, unknown>) => Promise.resolve({ id: 'mock' }),
   },
   syncState: {
-    findUnique: (options: any) => Promise.resolve(null),
-    update: (data: any) => Promise.resolve({ id: 'mock' }),
+    findUnique: (options: Record<string, unknown>) => Promise.resolve(null),
+    update: (data: Record<string, unknown>) => Promise.resolve({ id: 'mock' }),
   },
   auditLog: {
-    create: (data: any) => Promise.resolve({ id: 'mock' }),
-    findMany: (options: any) => Promise.resolve([]),
+    create: (data: Record<string, unknown>) => Promise.resolve({ id: 'mock' }),
+    findMany: (options: Record<string, unknown>) => Promise.resolve([]),
   },
   admin: {
-    findUnique: (options: any) => Promise.resolve(null),
+    findUnique: (options: Record<string, unknown>) => Promise.resolve(null),
   },
   $connect: () => Promise.resolve(),
   $disconnect: () => Promise.resolve(),
