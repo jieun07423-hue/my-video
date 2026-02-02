@@ -1,6 +1,5 @@
 import Navbar from './components/Navbar';
 import { StatCard } from './components/ui/StatCard';
-import { createApiUrl } from './lib/constants';
 
 export default function HomePage() {
   return (
@@ -43,24 +42,15 @@ export default function HomePage() {
 }
 
 function StatsSection() {
-  const stats = {
-    total: 1234,
-    newToday: 12,
-    newRecords: 45, 
-    active: 1156
-  };
-
   return (
     <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <StatCard title="전체 소상공인" value={stats.total} color="blue" />
-      <StatCard title="오늘 신규" value={stats.newToday} color="green" />
-      <StatCard title="신규 등록" value={stats.newRecords} color="yellow" />
-      <StatCard title="영업 중" value={stats.active} color="purple" />
+      <div className="rounded-lg bg-gray-100 p-6 animate-pulse h-32" />
+      <div className="rounded-lg bg-gray-100 p-6 animate-pulse h-32" />
+      <div className="rounded-lg bg-gray-100 p-6 animate-pulse h-32" />
+      <div className="rounded-lg bg-gray-100 p-6 animate-pulse h-32" />
     </div>
   );
 }
-
-
 
 function FeatureCard({
   title,

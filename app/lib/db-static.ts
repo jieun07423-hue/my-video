@@ -27,7 +27,7 @@ const mockBusinesses = [
     dataSource: 'test'
   },
   {
-    id: '2', 
+    id: '2',
     bizesId: 'TEST002',
     name: '테스트 상가 2',
     roadNameAddress: '서울시 서초구 강남대로 456',
@@ -89,7 +89,7 @@ class StaticBusinessRepository {
     let filtered = [...mockBusinesses];
 
     if (search) {
-      filtered = filtered.filter(b => 
+      filtered = filtered.filter(b =>
         b.name.toLowerCase().includes(search.toLowerCase()) ||
         b.roadNameAddress?.toLowerCase().includes(search.toLowerCase()) ||
         b.businessName?.toLowerCase().includes(search.toLowerCase())
@@ -178,42 +178,10 @@ class StaticSyncStateRepository {
       syncCount: 0,
       totalSynced: 0,
       newRecordsCount: 0,
+      lastBusinessId: null as string | null,
     };
   }
 }
 
-export const db = {
-  business: {
-    createMany: (data: { data: CreateBusinessInput[] }) => Promise.resolve({ count: data.data?.length || 0 }),
-    findMany: (options: Record<string, unknown>) => Promise.resolve([]),
-    findUnique: (options: Record<string, unknown>) => Promise.resolve(null),
-    count: (options: Record<string, unknown>) => Promise.resolve(0),
-    upsert: (data: Record<string, unknown>) => Promise.resolve({ id: 'mock' }),
-    update: (data: Record<string, unknown>) => Promise.resolve({ id: 'mock' }),
-  },
-  syncState: {
-    findUnique: (options: Record<string, unknown>) => Promise.resolve(null),
-    update: (data: Record<string, unknown>) => Promise.resolve({ id: 'mock' }),
-  },
-  auditLog: {
-    create: (data: Record<string, unknown>) => Promise.resolve({ id: 'mock' }),
-    findMany: (options: Record<string, unknown>) => Promise.resolve([]),
-  },
-  admin: {
-    findUnique: (options: Record<string, unknown>) => Promise.resolve(null),
-  },
-  $connect: () => Promise.resolve(),
-  $disconnect: () => Promise.resolve(),
-};
-
 export const staticBusinessRepository = new StaticBusinessRepository();
 export const staticSyncStateRepository = new StaticSyncStateRepository();
-
-export async function testConnection() {
-  return true;
-}
-
-export async function disconnectDatabase() {
-}
-
-export default db;

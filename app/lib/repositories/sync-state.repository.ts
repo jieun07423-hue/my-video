@@ -7,6 +7,7 @@ export interface SyncStateUpdate {
   lastBusinessId?: string;
   newRecordsCount?: number;
   totalSynced?: number;
+  syncCount?: number;
   lastSyncedAt?: Date;
 }
 
@@ -38,7 +39,7 @@ export class SyncStateRepository {
 
   async setSuccess(
     dataSource: string = 'public-data-portal',
-    options: { lastBusinessId?: string; newRecordsCount?: number; totalSynced?: number }
+    options: { lastBusinessId?: string; newRecordsCount?: number; totalSynced?: number; syncCount?: number }
   ) {
     return this.updateSyncState(dataSource, {
       syncStatus: 'success',
