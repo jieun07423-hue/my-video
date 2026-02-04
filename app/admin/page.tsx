@@ -1,5 +1,8 @@
 import Navbar from '../components/Navbar';
 import { StatCard } from '../components/ui/StatCard';
+import { SyncStatusCard } from '../components/ui/SyncStatusCard';
+import { SchedulerStatusCard } from '../components/ui/SchedulerStatusCard';
+import { ManualSyncCard } from '../components/ui/ManualSyncCard';
 import { createApiUrl } from '../lib/constants';
 
 export default function AdminPage() {
@@ -33,124 +36,28 @@ async function AdminDashboard() {
     throw new Error('데이터를 불러오는데 실패했습니다.');
   }
 
-  const [stats, syncStateData] = await Promise.all([
+  const [statsData, syncStateData] = await Promise.all([
     statsRes.json(),
     syncStateRes.json()
   ]);
 
+  const stats = statsData.data;
+  const syncState = syncStateData.data;
+
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <StatCard title="전체 소상공인" value={stats.total} icon="🏪" />
-      <StatCard title="신규 등록" value={stats.newRecords} icon="🆕" />
-      <StatCard title="영업 중" value={stats.active} icon="✅" />
-      <StatCard title="오늘 신규" value={stats.newToday} icon="📅" />
-
-      <SyncStatusCard syncState={syncStateData} />
-      <SchedulerStatusCard schedulerStatus={syncStateData} />
-
+      <StatCard title="전체 소상공인" value={stats.total || 0} icon="🏪" />
+      <StatCard title="신규 등록" value={stats.newRecords || 0} icon="🆕" />
+      <StatCard title="영업 중" value={stats.active || 0} icon="✅" />
+      <StatCard title="오늘 신규" value={stats.newToday || 0} icon="📅" />
+      
+      <SyncStatusCard syncState={{
+        syncStatus: syncState?.syncStatus || 'idle',
+        lastSyncedAt: syncState?.lastSyncedAt,
+        errorMessage: syncState?.errorMessage
+      }} />
+      
       <ManualSyncCard />
-    </div>
-  );
-}
-
-
-
-function SyncStatusCard({ syncState }: { syncState: { syncStatus: any; lastSyncedAt: any; errorMessage: any; } }) {
-  const statusColors = {
-    idle: 'bg-gray-100 text-gray-800',
-    running: 'bg-blue-100 text-blue-800',
-    success: 'bg-green-100 text-green-800',
-    failed: 'bg-red-100 text-red-800',
-  };
-
-  return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow">
-      <h3 className="mb-4 text-lg font-semibold text-gray-900">
-        동기화 상태
-      </h3>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">상태</span>
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-            statusColors[syncState.syncStatus as keyof typeof statusColors] ||
-            'bg-gray-100 text-gray-800'
-          }`}>
-            {syncState.syncStatus}
-          </span>
-        </div>
-        {syncState.lastSyncedAt && (
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">마지막 동기화</span>
-            <span className="text-sm font-medium text-gray-900">
-              {new Date(syncState.lastSyncedAt).toLocaleString('ko-KR')}
-            </span>
-          </div>
-        )}
-        {syncState.errorMessage && (
-          <div className="text-sm text-red-600">
-            에러: {syncState.errorMessage}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function SchedulerStatusCard({ schedulerStatus }: { schedulerStatus: { running: boolean; } }) {
-  return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow">
-      <h3 className="mb-4 text-lg font-semibold text-gray-900">
-        스케줄러 상태
-      </h3>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">실행 중</span>
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-            schedulerStatus.running
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}>
-            {schedulerStatus.running ? '실행 중' : '중지'}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ManualSyncCard() {
-  async function handleManualSync() {
-    try {
-      const res = await fetch('/api/sync', {
-        method: 'POST',
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        alert('동기화가 시작되었습니다.');
-        window.location.reload();
-      } else {
-        alert(`동기화 실패: ${data.message}`);
-      }
-    } catch (error) {
-      alert(`동기화 실패: ${error}`);
-    }
-  }
-
-  return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow">
-      <h3 className="mb-4 text-lg font-semibold text-gray-900">
-        수동 동기화
-      </h3>
-      <p className="mb-4 text-sm text-gray-600">
-        버튼을 클릭하여 공공데이터포털에서 데이터를 동기화합니다.
-      </p>
-      <button
-        onClick={handleManualSync}
-        className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-      >
-        동기화 시작
-      </button>
     </div>
   );
 }
