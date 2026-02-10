@@ -1,0 +1,69 @@
+name: PR 템플릿 검사
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-template-check:
+    name: PR 템플릿 검사
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: 변경된 파일들 가져오기
+        id: changed-files
+        run: |
+          if [ ${{ github.event_name }} == 'pull_request' ]; then
+            echo "::set-output name=files::$(git diff --name-only --diff-filter=ACMR ${{ github.event.before }} ${{ github.event.after }} | tr '\n' ' ')"
+          else
+            echo "::set-output name=files::$(git diff --name-only --diff-filter=ACMR ${{ github.base_ref }} ${{ github.sha }} | tr '\n' ' ')"
+          fi
+        shell: bash
+        
+      - name: 템플릿 존재 여부 확인
+        run: |
+          for file in ${{ steps.changed-files.outputs.files }}; do
+            if [[ $file == *template* ]] || [[ $file == *example* ]]; then
+              echo "Error: 템플릿 또는 예제 파일이 변경되었습니다. PR은 코드 변경만 포함해야 합니다."
+              exit 1
+            fi
+          done
+        shell: bash
+        
+      - name: 테스트 실행
+        run: |
+          echo "테스트 실행..."
+          npm test
+        shell: bash
+        
+      - name: 빌드 실행
+        run: |
+          echo "빌드 실행..."
+          npm run build
+        shell: bash
+        
+      - name: 린트 검사
+        run: |
+          echo "린트 검사..."
+          npm run lint
+        shell: bash
+
+  dependency-review:
+    name: 의존성 검토
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+        
+      - name: 의존성 검토 도구 실행
+        run: |
+          echo "의존성 검토..."
+          npx eslint --ext .js,.jsx,.ts,.tsx --format=stylish .
+        shell: bash

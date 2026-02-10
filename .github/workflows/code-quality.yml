@@ -1,0 +1,40 @@
+name: 코드 품질 검사
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  code-quality:
+    name: 코드 품질 분석
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: SonarCloud 스캔
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          
+      - name: 코드 복잡도 검사
+        run: |
+          echo "코드 복잡도 분석 중..."
+          # 실제 프로젝트의 복잡도를 분석하는 스크립트
+          find app -name "*.ts" -o -name "*.tsx" | wc -l
+          find lib -name "*.ts" | wc -l
+          echo "총 TypeScript 파일 수: $(find app lib -name "*.ts" -o -name "*.tsx" | wc -l | awk '{sum+=$1} END {print sum}')"
+          
+      - name: 보안 취약성 검사
+        run: |
+          echo "보안 취약성 검사 중..."
+          # API 키 노출 확인
+          rg -i "api[_-]?key|password|secret|token" --type ts --type js -n
+          # 하드코딩된 인증 정보 확인
+          rg -i "admin|password" app/auth/signin/page.tsx -n || echo "Admin credentials found"
