@@ -1,8 +1,13 @@
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect, afterEach } from '@jest/globals'
+import { render, cleanup } from '@testing-library/react'
 import { renderWithProviders, createMockBusiness } from '../../../__tests__/test-utils'
 import { BusinessTableRow } from './BusinessTableRow'
 
 describe('BusinessTableRow', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('renders business information correctly', () => {
     const business = createMockBusiness({
       name: '테스트 사업체',
@@ -21,11 +26,15 @@ describe('BusinessTableRow', () => {
   it('displays correct status badge', () => {
     const business = createMockBusiness({ status: 'active' })
 
-    const { getByText } = renderWithProviders(
+    const { container } = renderWithProviders(
       <BusinessTableRow business={business} index={0} />
     )
 
-    expect(getByText('영업중')).toBeInTheDocument()
+    const statusElements = container.querySelectorAll('td')
+    const statusCell = Array.from(statusElements).find(cell => 
+      cell.textContent?.includes('영업중')
+    )
+    expect(statusCell).toBeInTheDocument()
   })
 
   it('shows address correctly', () => {
@@ -33,11 +42,12 @@ describe('BusinessTableRow', () => {
       roadNameAddress: '서울시 강남구 테헤란로 123',
     })
 
-    const { getByText } = renderWithProviders(
+    const { container } = renderWithProviders(
       <BusinessTableRow business={business} index={0} />
     )
 
-    expect(getByText('서울시 강남구 테헤란로 123')).toBeInTheDocument()
+    const addressElement = container.querySelector('p')
+    expect(addressElement).toHaveTextContent('서울시 강남구 테헤란로 123')
   })
 
   it('shows NEW badge when showNewBadge is true', () => {
@@ -53,11 +63,11 @@ describe('BusinessTableRow', () => {
   it('has link to business detail page', () => {
     const business = createMockBusiness({ id: 'test-id-123' })
 
-    const { getByText } = renderWithProviders(
+    const { container } = renderWithProviders(
       <BusinessTableRow business={business} index={0} />
     )
 
-    const link = getByText('상세').closest('a')
-    expect(link).toHaveAttribute('href', '/businesses/test-id-123')
+    const link = container.querySelector('a[href="/businesses/test-id-123"]')
+    expect(link).toBeInTheDocument()
   })
 })

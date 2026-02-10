@@ -1,5 +1,5 @@
-import { dbLogger } from '@/app/lib/logger';
-import { staticBusinessRepository } from '@/app/lib/db-static';
+import { dbLogger } from '../logger';
+import { staticBusinessRepository } from '../db-static';
 
 export interface CreateBusinessInput {
   bizesId: string;
