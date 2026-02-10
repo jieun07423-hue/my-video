@@ -1,3 +1,8 @@
+'use client'
+
+import { useSession } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import { StatCard } from '../components/ui/StatCard';
 import { SyncStatusCard } from '../components/ui/SyncStatusCard';
@@ -6,10 +11,36 @@ import { ManualSyncCard } from '../components/ui/ManualSyncCard';
 import { createApiUrl } from '../lib/constants';
 
 export default function AdminPage() {
+  const { data: session } = useSession()
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    await signOut()
+    router.push('/auth/signin')
+  }
+
+  // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+  if (!session) {
+    router.push('/auth/signin')
+    return null
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-
+      <Navbar>
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-gray-700">
+            {session.user.email}님으로 로그인됨
+          </span>
+          <button
+            onClick={handleSignOut}
+            className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            로그아웃
+          </button>
+        </div>
+      </Navbar>
+      
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold text-gray-900">
@@ -19,7 +50,7 @@ export default function AdminPage() {
             시스템 관리 및 데이터 동기화
           </p>
         </div>
-
+        
         <AdminDashboard />
       </main>
     </div>
