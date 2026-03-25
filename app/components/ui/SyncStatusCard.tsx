@@ -1,7 +1,5 @@
 'use client';
 
-import { lucide } from 'lucide-react';
-
 interface SyncStatusCardProps {
   syncStatus: {
     syncStatus: 'idle' | 'running' | 'success' | 'failed';

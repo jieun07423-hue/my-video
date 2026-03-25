@@ -1,5 +1,6 @@
-import { syncStateRepository } from '@/app/lib/repositories/sync-state.repository';
-import { apiLogger } from '@/app/lib/logger';
+import { syncStateRepository } from '@/lib/repositories/sync-state.repository';
+import { apiLogger } from '@/lib/logger';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
       data: syncState
     });
   } catch (error) {
-    apiLogger.error({ error: error.message }, 'Failed to fetch sync status');
+    apiLogger.error({ error: error instanceof Error ? error.message : String(error) }, 'Failed to fetch sync status');
     return NextResponse.json(
       {
         success: false,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { businessRepository } from '@/app/lib/repositories/business.repository';
-import { apiLogger } from '@/app/lib/logger';
-import { createApiErrorResponse, createNotFoundResponse, createBadRequestResponse } from '@/app/lib/api/handlers';
+import { businessRepository } from '@/lib/repositories/business.repository';
+import { apiLogger } from '@/lib/logger';
+import { createApiErrorResponse, createNotFoundResponse, createBadRequestResponse } from '@/lib/api/handlers';
 
 interface RouteContext {
   params: {

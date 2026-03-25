@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { apiLogger } from '@/app/lib/logger';
+import { apiLogger } from '@/lib/logger';
 
 export interface RetryOptions {
   maxAttempts?: number;

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { apiLogger } from '@/app/lib/logger';
+import { apiLogger } from '@/lib/logger';
 
 export interface ApiError {
   message: string;

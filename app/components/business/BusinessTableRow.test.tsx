@@ -16,7 +16,11 @@ describe('BusinessTableRow', () => {
     })
 
     const { getByText } = renderWithProviders(
-      <BusinessTableRow business={business} index={0} />
+      <table>
+        <tbody>
+          <BusinessTableRow business={business} index={0} />
+        </tbody>
+      </table>
     )
 
     expect(getByText('테스트 사업체')).toBeInTheDocument()
@@ -27,7 +31,11 @@ describe('BusinessTableRow', () => {
     const business = createMockBusiness({ status: 'active' })
 
     const { container } = renderWithProviders(
-      <BusinessTableRow business={business} index={0} />
+      <table>
+        <tbody>
+          <BusinessTableRow business={business} index={0} />
+        </tbody>
+      </table>
     )
 
     const statusElements = container.querySelectorAll('td')
@@ -43,7 +51,11 @@ describe('BusinessTableRow', () => {
     })
 
     const { container } = renderWithProviders(
-      <BusinessTableRow business={business} index={0} />
+      <table>
+        <tbody>
+          <BusinessTableRow business={business} index={0} />
+        </tbody>
+      </table>
     )
 
     const addressElement = container.querySelector('p')
@@ -54,7 +66,11 @@ describe('BusinessTableRow', () => {
     const business = createMockBusiness()
 
     const { getByText } = renderWithProviders(
-      <BusinessTableRow business={business} showNewBadge={true} index={0} />
+      <table>
+        <tbody>
+          <BusinessTableRow business={business} showNewBadge={true} index={0} />
+        </tbody>
+      </table>
     )
 
     expect(getByText('NEW')).toBeInTheDocument()
@@ -64,7 +80,11 @@ describe('BusinessTableRow', () => {
     const business = createMockBusiness({ id: 'test-id-123' })
 
     const { container } = renderWithProviders(
-      <BusinessTableRow business={business} index={0} />
+      <table>
+        <tbody>
+          <BusinessTableRow business={business} index={0} />
+        </tbody>
+      </table>
     )
 
     const link = container.querySelector('a[href="/businesses/test-id-123"]')

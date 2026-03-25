@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { businessRepository } from '@/app/lib/repositories/business.repository';
-import { apiLogger } from '@/app/lib/logger';
-import { createApiErrorResponse, createBadRequestResponse } from '@/app/lib/api/handlers';
+import { businessRepository } from '@/lib/repositories/business.repository';
+import { apiLogger } from '@/lib/logger';
+import { createApiErrorResponse, createBadRequestResponse } from '@/lib/api/handlers';
 
 /**
  * GET /api/businesses - 소상공인 목록 조회

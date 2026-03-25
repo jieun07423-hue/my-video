@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { useBusinesses } from '@/app/lib/hooks/useBusinesses';
-import { useBusinessStats } from '@/app/lib/hooks/useBusinesses';
+import { useBusinesses } from '@/lib/hooks/useBusinesses';
+import { useBusinessStats } from '@/lib/hooks/useBusinesses';
 import Link from 'next/link';
-import Navbar from '@/app/components/Navbar';
-import { StatCard } from '@/app/components/ui/StatCard';
-import { BusinessTableRow } from '@/app/components/business/BusinessTableRow';
+import Navbar from '@/components/Navbar';
+import { StatCard } from '@/components/ui/StatCard';
+import { BusinessTableRow } from '@/components/business/BusinessTableRow';
 import { 
   Search, 
   Filter, 

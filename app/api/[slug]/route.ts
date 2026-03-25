@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { syncStateRepository } from '@/app/lib/repositories/sync-state.repository';
-import { apiLogger } from '@/app/lib/logger';
+import { syncStateRepository } from '@/lib/repositories/sync-state.repository';
+import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {

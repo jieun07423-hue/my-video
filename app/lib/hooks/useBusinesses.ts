@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { businessRepository } from '@/app/lib/repositories/business.repository';
-import type { SearchOptions } from '@/app/lib/repositories/business.repository';
+import { businessRepository } from '@/lib/repositories/business.repository';
+import type { SearchOptions } from '@/lib/repositories/business.repository';
 
 export function useBusinesses(options: SearchOptions = {}) {
   return useQuery({

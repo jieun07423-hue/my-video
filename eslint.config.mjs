@@ -1,8 +1,5 @@
 import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
-import typescriptPlugin from "@typescript-eslint/eslint-plugin";
-import typescriptParser from "@typescript-eslint/parser";
-import nextPlugin from "@next/eslint-plugin-next";
 
 const compat = new FlatCompat({
   baseDirectory: import.meta.dirname,

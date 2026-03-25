@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/app/lib/auth'
-import { signOut } from 'next-auth'
+import { auth } from '@/lib/auth'
+import { signOut } from 'next-auth/react'
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,4 +1,4 @@
-import { BusinessItem } from '@/app/types/api';
+import { BusinessItem } from '@/types/api';
 
 enum BusinessStatus {
   pending = 'pending',
@@ -13,7 +13,7 @@ enum RecordStatus {
   synced = 'synced', 
   verified = 'verified'
 }
-import { apiLogger } from '@/app/lib/logger';
+import { apiLogger } from '@/lib/logger';
 
 /**
  * API 응답을 데이터베이스 엔티티로 변환

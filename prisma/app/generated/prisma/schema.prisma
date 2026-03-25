@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 소상공인 상태
+enum BusinessStatus {
+  pending // 대기
+  active // 활성
+  inactive // 비활성
+  dissolved // 해산
+  pending_renewal // 갱신 대기
+}
+
+// 레코드 상태 (신규 감지용)
+enum RecordStatus {
+  new // 신규
+  synced // 동기화됨
+  verified // 검증됨
+}
+
+// 어드민 사용자
+model Admin {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  email        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  auditLogs AuditLog[]
+
+  @@map("admins")
+}
+
+// 소상공인 정보
+model Business {
+  id               String   @id @default(cuid())
+  bizesId          String   @unique @map("bizes_id") // 상가업소번호
+  name             String   @map("name")
+  roadNameAddress  String?  @map("road_name_address") // 도로명주소
+  lotNumberAddress String?  @map("lot_number_address") // 지번주소
+  phone            String?
+  latitude         Decimal? @map("latitude") @db.Decimal(10, 8)
+  longitude        Decimal? @map("longitude") @db.Decimal(11, 8)
+  businessCode     String?  @map("business_code") // 업종코드
+  businessName     String?  @map("business_name") // 업종명
+
+  // 분류 정보
+  indsLclsCd String? @map("inds_lcls_cd") // 대분류코드
+  indsLclsNm String? @map("inds_lcls_nm") // 대분류명
+  indsMclsCd String? @map("inds_mcls_cd") // 중분류코드
+  indsMclsNm String? @map("inds_mcls_nm") // 중분류명
+  indsSclsCd String? @map("inds_scls_cd") // 소분류코드
+  indsSclsNm String? @map("inds_scls_nm") // 소분류명
+
+  // 상태 정보
+  status       BusinessStatus @default(pending)
+  recordStatus RecordStatus   @default(new)
+
+  // 타임스탬프
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  lastSyncedAt DateTime? @map("last_synced_at")
+
+  // 메타데이터
+  dataSource String? @map("data_source") // 데이터 출처
+  externalId String? @map("external_id") // 외부 시스템 ID
+
+  auditLogs AuditLog[]
+
+  @@index([recordStatus, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([name])
+  @@index([businessCode])
+  @@index([createdAt(sort: Desc)])
+  @@map("businesses")
+}
+
+// 동기화 상태
+model SyncState {
+  id              String   @id @default(cuid())
+  dataSource      String   @unique @map("data_source")
+  lastSyncedAt    DateTime @default(now()) @map("last_synced_at")
+  lastBusinessId  String?  @map("last_business_id")
+  syncStatus      String   @default("idle") @map("sync_status") // idle, running, success, failed
+  errorMessage    String?  @map("error_message")
+  syncCount       Int      @default(0) @map("sync_count")
+  totalSynced     Int      @default(0) @map("total_synced")
+  newRecordsCount Int      @default(0) @map("new_records_count")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("sync_states")
+}
+
+// 감사 로그
+model AuditLog {
+  id           String  @id @default(cuid())
+  businessId   String  @map("business_id")
+  action       String // INSERT, UPDATE, DELETE, STATUS_CHANGE
+  previousData Json?   @map("previous_data")
+  newData      Json?   @map("new_data")
+  changedBy    String? @map("changed_by")
+  userId       String? @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  admin    Admin?   @relation(fields: [userId], references: [id])
+
+  @@index([businessId, createdAt(sort: Desc)])
+  @@index([action, createdAt(sort: Desc)])
+  @@map("audit_logs")
+}

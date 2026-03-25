@@ -4,11 +4,16 @@ import Link from 'next/link';
 import { ReactNode, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 
-export default function Navbar() {
+export default function Navbar({ children }: { children?: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <nav className="relative bg-gradient-to-r from-slate-50 to-gray-50 shadow-lg border-b border-slate-200/50 backdrop-blur-sm">
+      {children && (
+        <div className="bg-blue-50 border-b border-blue-100 px-4 py-2">
+          {children}
+        </div>
+      )}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-18 items-center justify-between">
           <Link 
@@ -38,6 +43,7 @@ export default function Navbar() {
             <NavLink href="/">홈</NavLink>
             <NavLink href="/businesses">소상공인 목록</NavLink>
             <NavLink href="/new">신규 등록</NavLink>
+            <NavLink href="/genie">🧞 지니</NavLink>
             <NavLink href="/admin">어드민</NavLink>
           </div>
 
@@ -72,6 +78,9 @@ export default function Navbar() {
             </MobileNavLink>
             <MobileNavLink href="/new" onClick={() => setIsMobileMenuOpen(false)}>
               신규 등록
+            </MobileNavLink>
+            <MobileNavLink href="/genie" onClick={() => setIsMobileMenuOpen(false)}>
+              🧞 지니
             </MobileNavLink>
             <MobileNavLink href="/admin" onClick={() => setIsMobileMenuOpen(false)}>
               어드민

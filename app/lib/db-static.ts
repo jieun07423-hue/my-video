@@ -1,5 +1,5 @@
-import { dbLogger, syncLogger } from '@/app/lib/logger';
-import type { CreateBusinessInput, SearchOptions } from '@/app/lib/repositories/business.repository';
+import { dbLogger, syncLogger } from '@/lib/logger';
+import type { CreateBusinessInput, SearchOptions } from '@/lib/repositories/business.repository';
 
 const mockBusinesses = [
   {

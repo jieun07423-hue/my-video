@@ -1,0 +1,629 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Small Business Tracker API",
+    "version": "1.0.0",
+    "description": "소상공인 정보 관리를 위한 RESTful API",
+    "contact": {
+      "name": "API Support",
+      "email": "api@example.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "개발 서버"
+    },
+    {
+      "url": "https://your-domain.com",
+      "description": "프로덕션 서버"
+    }
+  ],
+  "tags": [
+    {
+      "name": "기본",
+      "description": "기본 관련 API"
+    },
+    {
+      "name": "인증",
+      "description": "인증 관련 API"
+    },
+    {
+      "name": "소상공인",
+      "description": "소상공인 관련 API"
+    },
+    {
+      "name": "대시보드",
+      "description": "대시보드 관련 API"
+    },
+    {
+      "name": "동기화",
+      "description": "동기화 관련 API"
+    }
+  ],
+  "paths": {
+    "//{slug}": {
+      "get": {
+        "summary": "GET /{slug}",
+        "description": "GET /{slug}",
+        "tags": [
+          "기본"
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "slug 파라미터"
+          },
+          {
+            "name": "page",
+            "type": "integer",
+            "description": "페이지 번호 (기본값: 1)"
+          },
+          {
+            "name": "limit",
+            "type": "integer",
+            "description": "페이지당 항목 수 (기본값: 20)"
+          },
+          {
+            "name": "search",
+            "type": "string",
+            "description": "검색어"
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "description": "상태 필터"
+          },
+          {
+            "name": "recordStatus",
+            "type": "string",
+            "description": "레코드 상태 필터"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      }
+    },
+    "//auth/me": {
+      "get": {
+        "summary": "GET /auth/me",
+        "description": "GET /auth/me",
+        "tags": [
+          "인증"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      }
+    },
+    "//auth/signin": {
+      "post": {
+        "summary": "POST /auth/signin",
+        "description": "POST /auth/signin",
+        "tags": [
+          "인증"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      }
+    },
+    "//auth/signout": {
+      "post": {
+        "summary": "POST /auth/signout",
+        "description": "POST /auth/signout",
+        "tags": [
+          "인증"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      }
+    },
+    "//businesses/{id}": {
+      "get": {
+        "summary": "GET /api/businesses/[id] - 소상공인 상세 조회",
+        "description": "GET /api/businesses/[id] - 소상공인 상세 조회",
+        "tags": [
+          "소상공인"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "id 파라미터"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      },
+      "put": {
+        "summary": "GET /api/businesses/[id] - 소상공인 상세 조회",
+        "description": "GET /api/businesses/[id] - 소상공인 상세 조회",
+        "tags": [
+          "소상공인"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "id 파라미터"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      },
+      "delete": {
+        "summary": "GET /api/businesses/[id] - 소상공인 상세 조회",
+        "description": "GET /api/businesses/[id] - 소상공인 상세 조회",
+        "tags": [
+          "소상공인"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "id 파라미터"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      }
+    },
+    "//businesses": {
+      "get": {
+        "summary": "GET /api/businesses - 소상공인 목록 조회",
+        "description": "GET /api/businesses - 소상공인 목록 조회",
+        "tags": [
+          "소상공인"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "type": "integer",
+            "description": "페이지 번호 (기본값: 1)"
+          },
+          {
+            "name": "limit",
+            "type": "integer",
+            "description": "페이지당 항목 수 (기본값: 20)"
+          },
+          {
+            "name": "search",
+            "type": "string",
+            "description": "검색어"
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "description": "상태 필터"
+          },
+          {
+            "name": "recordStatus",
+            "type": "string",
+            "description": "레코드 상태 필터"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      },
+      "post": {
+        "summary": "GET /api/businesses - 소상공인 목록 조회",
+        "description": "GET /api/businesses - 소상공인 목록 조회",
+        "tags": [
+          "소상공인"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      }
+    },
+    "//dashboard/stats": {
+      "get": {
+        "summary": "GET /dashboard/stats",
+        "description": "GET /dashboard/stats",
+        "tags": [
+          "대시보드"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      }
+    },
+    "//sync": {
+      "post": {
+        "summary": "POST /sync",
+        "description": "POST /sync",
+        "tags": [
+          "동기화"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      }
+    },
+    "//sync/status": {
+      "get": {
+        "summary": "GET /sync/status",
+        "description": "GET /sync/status",
+        "tags": [
+          "동기화"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      }
+    },
+    "//webhook/sync": {
+      "post": {
+        "summary": "POST /webhook/sync",
+        "description": "POST /webhook/sync",
+        "tags": [
+          "동기화"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "404": {
+            "description": "리소스를 찾을 수 없음"
+          },
+          "500": {
+            "description": "서버 내부 오류"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Business": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "고유 ID"
+          },
+          "bizesId": {
+            "type": "string",
+            "description": "상가업소번호"
+          },
+          "name": {
+            "type": "string",
+            "description": "상호명"
+          },
+          "roadNameAddress": {
+            "type": "string",
+            "description": "도로명 주소"
+          },
+          "lotNumberAddress": {
+            "type": "string",
+            "description": "지번 주소"
+          },
+          "phone": {
+            "type": "string",
+            "description": "전화번호"
+          },
+          "businessName": {
+            "type": "string",
+            "description": "업종명"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "active",
+              "inactive",
+              "dissolved",
+              "pending_renewal"
+            ],
+            "description": "영업 상태"
+          },
+          "recordStatus": {
+            "type": "string",
+            "enum": [
+              "new",
+              "synced",
+              "verified"
+            ],
+            "description": "레코드 상태"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "생성일"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "수정일"
+          }
+        }
+      },
+      "BusinessListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Business"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "전체 항목 수"
+          },
+          "page": {
+            "type": "integer",
+            "description": "현재 페이지"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "페이지당 항목 수"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "전체 페이지 수"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "에러 메시지"
+          }
+        }
+      }
+    }
+  }
+}

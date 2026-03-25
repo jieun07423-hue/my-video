@@ -1,0 +1,1668 @@
+{
+  "timestamp": "2026-02-11T15:18:02.827Z",
+  "project": {
+    "name": "small-business-tracker",
+    "version": "0.1.0"
+  },
+  "current_state": {
+    "workflows": {
+      "ci-cd.yml": {
+        "name": "ci-cd.yml",
+        "triggers": [
+          ""
+        ],
+        "jobs": [],
+        "steps": [],
+        "issues": [
+          {
+            "line": 37,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "token: ${{ secrets.CODECOV_TOKEN }}"
+          },
+          {
+            "line": 88,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
+          },
+          {
+            "line": 89,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}"
+          },
+          {
+            "line": 90,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}"
+          },
+          {
+            "line": 91,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}"
+          },
+          {
+            "line": 92,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}"
+          },
+          {
+            "line": 93,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "SUPABASE_URL: ${{ secrets.SUPABASE_URL }}"
+          },
+          {
+            "line": 94,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}"
+          },
+          {
+            "line": 95,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}"
+          },
+          {
+            "line": 96,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}"
+          },
+          {
+            "line": 118,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "vercel-token: ${{ secrets.VERCEL_TOKEN }}"
+          },
+          {
+            "line": 119,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}"
+          },
+          {
+            "line": 120,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}"
+          },
+          {
+            "line": 122,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "github-token: ${{ secrets.GITHUB_TOKEN }}"
+          }
+        ]
+      },
+      "code-quality.yml": {
+        "name": "code-quality.yml",
+        "triggers": [
+          ""
+        ],
+        "jobs": [],
+        "steps": [],
+        "issues": [
+          {
+            "line": 23,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}"
+          },
+          {
+            "line": 24,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}"
+          },
+          {
+            "line": 27,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          },
+          {
+            "line": 30,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "find app -name \"*.ts\" -o -name \"*.tsx\" | wc -l"
+          },
+          {
+            "line": 31,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "find lib -name \"*.ts\" | wc -l"
+          },
+          {
+            "line": 32,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "echo \"총 TypeScript 파일 수: $(find app lib -name \"*.ts\" -o -name \"*.tsx\" | wc -l | awk '{sum+=$1} END {print sum}')\""
+          },
+          {
+            "line": 35,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          },
+          {
+            "line": 38,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "rg -i \"api[_-]?key|password|secret|token\" --type ts --type js -n"
+          },
+          {
+            "line": 40,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "rg -i \"admin|password\" app/auth/signin/page.tsx -n || echo \"Admin credentials found\""
+          }
+        ]
+      },
+      "deploy-fixed.yml": {
+        "name": "deploy-fixed.yml",
+        "triggers": [
+          ""
+        ],
+        "jobs": [],
+        "steps": [],
+        "issues": [
+          {
+            "line": 32,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "vercel-token: ${{ secrets.VERCEL_TOKEN }}"
+          },
+          {
+            "line": 33,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}"
+          },
+          {
+            "line": 34,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_NEW }}"
+          }
+        ]
+      },
+      "deploy.yml": {
+        "name": "deploy.yml",
+        "triggers": [
+          ""
+        ],
+        "jobs": [],
+        "steps": [],
+        "issues": [
+          {
+            "line": 32,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "vercel-token: ${{ secrets.VERCEL_TOKEN }}"
+          },
+          {
+            "line": 33,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}"
+          },
+          {
+            "line": 34,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_NEW }}"
+          }
+        ]
+      },
+      "dev-check.yml": {
+        "name": "dev-check.yml",
+        "triggers": [
+          ""
+        ],
+        "jobs": [],
+        "steps": [],
+        "issues": [
+          {
+            "line": 19,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          },
+          {
+            "line": 20,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "환경변수 노출"
+            },
+            "description": "echo \"DATABASE_URL 설정 확인: ${DATABASE_URL:0:50}\""
+          },
+          {
+            "line": 24,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
+          },
+          {
+            "line": 25,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}"
+          },
+          {
+            "line": 26,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "NODE_ENV: ${{ secrets.NODE_ENV }}"
+          },
+          {
+            "line": 29,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          },
+          {
+            "line": 31,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "curl -f ${{ secrets.NEXTAUTH_URL }}/api/health || echo \"Health check failed\""
+          },
+          {
+            "line": 33,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
+          },
+          {
+            "line": 34,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}"
+          },
+          {
+            "line": 35,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "NODE_ENV: ${{ secrets.NODE_ENV }}"
+          }
+        ]
+      },
+      "performance.yml": {
+        "name": "performance.yml",
+        "triggers": [
+          ""
+        ],
+        "jobs": [],
+        "steps": [],
+        "issues": [
+          {
+            "line": 31,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
+          },
+          {
+            "line": 32,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}"
+          },
+          {
+            "line": 33,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}"
+          },
+          {
+            "line": 34,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}"
+          },
+          {
+            "line": 35,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}"
+          },
+          {
+            "line": 36,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "SUPABASE_URL: ${{ secrets.SUPABASE_URL }}"
+          },
+          {
+            "line": 37,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}"
+          },
+          {
+            "line": 38,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}"
+          },
+          {
+            "line": 39,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}"
+          },
+          {
+            "line": 42,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          },
+          {
+            "line": 47,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "--upload.token=${{ secrets.LHCI_GITHUB_TOKEN }}"
+          },
+          {
+            "line": 49,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_TOKEN }}"
+          },
+          {
+            "line": 62,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
+          },
+          {
+            "line": 63,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}"
+          },
+          {
+            "line": 64,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}"
+          },
+          {
+            "line": 65,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}"
+          },
+          {
+            "line": 66,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}"
+          },
+          {
+            "line": 67,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "SUPABASE_URL: ${{ secrets.SUPABASE_URL }}"
+          },
+          {
+            "line": 68,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}"
+          },
+          {
+            "line": 69,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}"
+          },
+          {
+            "line": 70,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "high",
+              "description": "하드코딩된 민감 정보"
+            },
+            "description": "SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}"
+          },
+          {
+            "line": 73,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          },
+          {
+            "line": 75,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "du -sh .next | sort -rh | head -5"
+          },
+          {
+            "line": 78,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          }
+        ]
+      },
+      "pr-check.yml": {
+        "name": "pr-check.yml",
+        "triggers": [
+          ""
+        ],
+        "jobs": [],
+        "steps": [],
+        "issues": [
+          {
+            "line": 21,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          },
+          {
+            "line": 23,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "echo \"::set-output name=files::$(git diff --name-only --diff-filter=ACMR ${{ github.event.before }} ${{ github.event.after }} | tr '\\n' ' ')\""
+          },
+          {
+            "line": 25,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "echo \"::set-output name=files::$(git diff --name-only --diff-filter=ACMR ${{ github.base_ref }} ${{ github.sha }} | tr '\\n' ' ')\""
+          },
+          {
+            "line": 30,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          },
+          {
+            "line": 32,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "if [[ $file == *template* ]] || [[ $file == *example* ]]; then"
+          },
+          {
+            "line": 40,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          },
+          {
+            "line": 46,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          },
+          {
+            "line": 52,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          },
+          {
+            "line": 66,
+            "issue": {
+              "pattern": {},
+              "type": "security",
+              "severity": "medium",
+              "description": "쉘에서 비밀번호 전달"
+            },
+            "description": "run: |"
+          }
+        ]
+      }
+    },
+    "dependencies": {
+      "outdated": [
+        {
+          "package": "next",
+          "current": "^14.2.15",
+          "latest": "14.2.35",
+          "severity": "low"
+        },
+        {
+          "package": "react",
+          "current": "^18.3.1",
+          "latest": "18.3.1",
+          "severity": "low"
+        },
+        {
+          "package": "typescript",
+          "current": "^5.6.3",
+          "latest": "5.6.3",
+          "severity": "low"
+        },
+        {
+          "package": "@tanstack/react-query",
+          "current": "^5.90.19",
+          "latest": "5.90.19",
+          "severity": "low"
+        }
+      ],
+      "vulnerable": [],
+      "redundant": [],
+      "heavy": []
+    },
+    "issues": [
+      {
+        "line": 37,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "token: ${{ secrets.CODECOV_TOKEN }}"
+      },
+      {
+        "line": 88,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
+      },
+      {
+        "line": 89,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}"
+      },
+      {
+        "line": 90,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}"
+      },
+      {
+        "line": 91,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}"
+      },
+      {
+        "line": 92,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}"
+      },
+      {
+        "line": 93,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "SUPABASE_URL: ${{ secrets.SUPABASE_URL }}"
+      },
+      {
+        "line": 94,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}"
+      },
+      {
+        "line": 95,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}"
+      },
+      {
+        "line": 96,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}"
+      },
+      {
+        "line": 118,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "vercel-token: ${{ secrets.VERCEL_TOKEN }}"
+      },
+      {
+        "line": 119,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}"
+      },
+      {
+        "line": 120,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}"
+      },
+      {
+        "line": 122,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "github-token: ${{ secrets.GITHUB_TOKEN }}"
+      },
+      {
+        "line": 23,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}"
+      },
+      {
+        "line": 24,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}"
+      },
+      {
+        "line": 27,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 30,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "find app -name \"*.ts\" -o -name \"*.tsx\" | wc -l"
+      },
+      {
+        "line": 31,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "find lib -name \"*.ts\" | wc -l"
+      },
+      {
+        "line": 32,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "echo \"총 TypeScript 파일 수: $(find app lib -name \"*.ts\" -o -name \"*.tsx\" | wc -l | awk '{sum+=$1} END {print sum}')\""
+      },
+      {
+        "line": 35,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 38,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "rg -i \"api[_-]?key|password|secret|token\" --type ts --type js -n"
+      },
+      {
+        "line": 40,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "rg -i \"admin|password\" app/auth/signin/page.tsx -n || echo \"Admin credentials found\""
+      },
+      {
+        "line": 32,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "vercel-token: ${{ secrets.VERCEL_TOKEN }}"
+      },
+      {
+        "line": 33,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}"
+      },
+      {
+        "line": 34,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_NEW }}"
+      },
+      {
+        "line": 32,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "vercel-token: ${{ secrets.VERCEL_TOKEN }}"
+      },
+      {
+        "line": 33,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}"
+      },
+      {
+        "line": 34,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_NEW }}"
+      },
+      {
+        "line": 19,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 20,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "환경변수 노출"
+        },
+        "description": "echo \"DATABASE_URL 설정 확인: ${DATABASE_URL:0:50}\""
+      },
+      {
+        "line": 24,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
+      },
+      {
+        "line": 25,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}"
+      },
+      {
+        "line": 26,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "NODE_ENV: ${{ secrets.NODE_ENV }}"
+      },
+      {
+        "line": 29,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 31,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "curl -f ${{ secrets.NEXTAUTH_URL }}/api/health || echo \"Health check failed\""
+      },
+      {
+        "line": 33,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
+      },
+      {
+        "line": 34,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}"
+      },
+      {
+        "line": 35,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "NODE_ENV: ${{ secrets.NODE_ENV }}"
+      },
+      {
+        "line": 31,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
+      },
+      {
+        "line": 32,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}"
+      },
+      {
+        "line": 33,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}"
+      },
+      {
+        "line": 34,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}"
+      },
+      {
+        "line": 35,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}"
+      },
+      {
+        "line": 36,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "SUPABASE_URL: ${{ secrets.SUPABASE_URL }}"
+      },
+      {
+        "line": 37,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}"
+      },
+      {
+        "line": 38,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}"
+      },
+      {
+        "line": 39,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}"
+      },
+      {
+        "line": 42,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 47,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "--upload.token=${{ secrets.LHCI_GITHUB_TOKEN }}"
+      },
+      {
+        "line": 49,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_TOKEN }}"
+      },
+      {
+        "line": 62,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "DATABASE_URL: ${{ secrets.DATABASE_URL }}"
+      },
+      {
+        "line": 63,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}"
+      },
+      {
+        "line": 64,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}"
+      },
+      {
+        "line": 65,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}"
+      },
+      {
+        "line": 66,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}"
+      },
+      {
+        "line": 67,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "SUPABASE_URL: ${{ secrets.SUPABASE_URL }}"
+      },
+      {
+        "line": 68,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}"
+      },
+      {
+        "line": 69,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}"
+      },
+      {
+        "line": 70,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "high",
+          "description": "하드코딩된 민감 정보"
+        },
+        "description": "SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}"
+      },
+      {
+        "line": 73,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 75,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "du -sh .next | sort -rh | head -5"
+      },
+      {
+        "line": 78,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 21,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 23,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "echo \"::set-output name=files::$(git diff --name-only --diff-filter=ACMR ${{ github.event.before }} ${{ github.event.after }} | tr '\\n' ' ')\""
+      },
+      {
+        "line": 25,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "echo \"::set-output name=files::$(git diff --name-only --diff-filter=ACMR ${{ github.base_ref }} ${{ github.sha }} | tr '\\n' ' ')\""
+      },
+      {
+        "line": 30,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 32,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "if [[ $file == *template* ]] || [[ $file == *example* ]]; then"
+      },
+      {
+        "line": 40,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 46,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 52,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      },
+      {
+        "line": 66,
+        "issue": {
+          "pattern": {},
+          "type": "security",
+          "severity": "medium",
+          "description": "쉘에서 비밀번호 전달"
+        },
+        "description": "run: |"
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "category": "CI/CD 자동화",
+      "priority": "high",
+      "items": [
+        {
+          "title": "PR 템플릿 자동화",
+          "description": "PR에 자동으로 라벨 붙이기",
+          "implementation": "GitHub Actions를 통한 자동 라벨링 추가",
+          "files": [
+            ".github/workflows/pr-labeler.yml"
+          ],
+          "benefit": "PR 관리 자동화 및 코드 품질 일관성"
+        },
+        {
+          "title": "배포 파이프라인 강화",
+          "description": "스테이징 환경에서 자동 테스트",
+          "implementation": "배포 전에 통합 테스트 실행",
+          "files": [
+            ".github/workflows/deploy-with-tests.yml"
+          ],
+          "benefit": "배포 안정성 향상 및 회귀 방지"
+        },
+        {
+          "title": "스셌이징 환경 자동화",
+          "description": "Lighthouse 자동 실행 및 리포트",
+          "implementation": "성능 테스트 자동화 및 추세 트래킹",
+          "files": [
+            ".github/workflows/performance-tracking.yml"
+          ],
+          "benefit": "성능 저하 조기 발견"
+        }
+      ]
+    },
+    {
+      "category": "보안 및 거버넌스",
+      "priority": "high",
+      "items": [
+        {
+          "title": "의존성 관리 강화",
+          "description": "주기적인 의존성 업데이트",
+          "implementation": "Renovate 또는 Dep으로 자동 업데이트",
+          "files": [
+            "renovate.json",
+            ".github/renovate.yml"
+          ],
+          "benefit": "보안 패치 적시 적용 및 최신 버전 유지"
+        },
+        {
+          "title": "Secrets 스캔 자동화",
+          "description": "GitHub Secrets 스캐 및 관리",
+          "implementation": "GitLeaks 또는 TruffleHog 도입",
+          "files": [
+            ".github/workflows/secret-scanning.yml"
+          ],
+          "benefit": "인증 정보 노출 방지"
+        }
+      ]
+    },
+    {
+      "category": "모니터링 및 알림",
+      "priority": "medium",
+      "items": [
+        {
+          "title": "에러 모니터링 강화",
+          "description": "실시간 에러 알림 시스템",
+          "implementation": "Sentry, Rollbar, DataDog 도입",
+          "files": [
+            "app/lib/monitoring/",
+            ".github/workflows/error-monitoring.yml"
+          ],
+          "benefit": "프로덕션 에러 신속 감지 및 대응"
+        },
+        {
+          "title": "성능 모니터링",
+          "description": "실시간 성능 메트릭 수집",
+          "implementation": "APM 도구 연동",
+          "files": [
+            "app/lib/monitoring/performance.ts"
+          ],
+          "benefit": "성능 병목 사전 예방"
+        }
+      ]
+    }
+  ],
+  "next_steps": [
+    {
+      "phase": "즉시 (1주 이내)",
+      "tasks": [
+        "1. npm audit --fix 실행으로 보안 취약점 해결",
+        "2. package.json 최신화 및 정리",
+        "3. ESLint 규칙 강화",
+        "4. TypeScript strict mode 검토"
+      ]
+    },
+    {
+      "phase": "단기 (1개월 이내)",
+      "tasks": [
+        "1. Renovate 도입으로 의존성 관리 자동화",
+        "2. Sentry 도입으로 에러 모니터링 강화",
+        "3. Lighthouse 자동화로 성능 모니터링",
+        "4. GitHub Actions 워크플로우 재구성"
+      ]
+    },
+    {
+      "phase": "장기 (3개월 이내)",
+      "tasks": [
+        "1. APM 도구 도입으로 성능 모니터링 고도화",
+        "2. 컨테이너 오케스트레이션 도입",
+        "3. Blue-Green 배포 자동화",
+        "4. IaC (Infrastructure as Code) 적용"
+      ]
+    }
+  ]
+}

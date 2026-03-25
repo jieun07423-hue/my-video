@@ -1,6 +1,6 @@
 import * as cron from 'node-cron';
-import { syncWorker } from '@/app/workers/sync-worker';
-import { syncLogger } from '@/app/lib/logger';
+import { syncWorker } from '@/workers/sync-worker';
+import { syncLogger } from '@/lib/logger';
 
 let syncJob: any | null = null;
 let isJobRunning = false;

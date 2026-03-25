@@ -1,5 +1,5 @@
-import { syncLogger } from '@/app/lib/logger';
-import { staticSyncStateRepository } from '@/app/lib/db-static';
+import { syncLogger } from '@/lib/logger';
+import { staticSyncStateRepository } from '@/lib/db-static';
 
 export interface SyncStateUpdate {
   syncStatus?: 'idle' | 'running' | 'success' | 'failed';

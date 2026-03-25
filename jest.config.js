@@ -11,15 +11,13 @@ const customJestConfig = {
   testEnvironmentOptions: {
     customExportConditions: ['', 'node', 'node-addons'],
   },
-  globals: {
-    'ts-jest': {
-      useESM: true,
-    },
-  },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/app/$1',
     '^@app/(.*)$': '<rootDir>/app/$1',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(axios)/)',
+  ],
   collectCoverageFrom: [
     'app/**/*.{js,jsx,ts,tsx}',
     'components/**/*.{js,jsx,ts,tsx}',
