@@ -1,6 +1,6 @@
 import NextAuth, { DefaultSession } from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import { db } from './db'
+import db from './db'
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 
