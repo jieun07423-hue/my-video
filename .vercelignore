@@ -1,0 +1,35 @@
+# Dependencies
+node_modules
+
+# Next.js build output
+.next
+
+# Testing
+coverage
+test-results
+playwright-report
+
+# Prisma generated files (will be regenerated during build)
+prisma/app
+
+# Development files
+*.log
+*.err
+logs
+
+# Shell scripts
+test-*.sh
+check-*.sh
+check-*.js
+test-*.js
+commit-msg.txt
+deploy-github-pages.sh
+
+# Git
+.git
+.gitignore
+
+# Environment (will be set in Vercel dashboard)
+.env
+.env.*
+!.env.example
