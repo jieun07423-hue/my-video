@@ -43,3 +43,15 @@ next-env.d.ts
 /app/generated/prisma
 dev-test.err
 dev-test.log
+test-supabase-secret.sh
+test-supabase.sh
+test-ipv4.sh
+test-new-db.sh
+test-full.sh
+test-api.sh
+test-api-advanced.sh
+check-db.sh
+check-tables.js
+test-db-node.js
+test-new-db-node.js
+test-db-connection.sh
