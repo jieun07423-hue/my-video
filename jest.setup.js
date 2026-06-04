@@ -1,11 +1,21 @@
 import '@testing-library/jest-dom'
 
-// Mock Web APIs for Next.js API routes
+Element.prototype.scrollIntoView = jest.fn()
+
 Object.defineProperty(global, 'Request', {
   writable: true,
   value: class MockRequest {
-    constructor(url) {
-      this.url = url
+    constructor(url, init) {
+      this._url = url
+      this.method = init?.method || 'GET'
+      this.body = init?.body
+      this.headers = new Headers(init?.headers)
+    }
+    get url() {
+      return this._url
+    }
+    async json() {
+      return JSON.parse(this.body)
     }
   },
 })
@@ -16,37 +26,20 @@ Object.defineProperty(global, 'Response', {
     constructor(body, init = {}) {
       this.body = body
       this.status = init.status || 200
-      this.headers = new Map()
+      this.headers = new Headers(init.headers)
     }
-    
-    json() {
-      return Promise.resolve(typeof this.body === 'string' ? JSON.parse(this.body) : this.body)
+    async json() {
+      return typeof this.body === 'string' ? JSON.parse(this.body) : this.body
     }
-  },
-})
-
-Object.defineProperty(global, 'URL', {
-  writable: true,
-  value: class MockURL {
-    constructor(url) {
-      this.url = url
-      const [baseUrl, queryString] = url.split('?')
-      this.searchParams = new Map()
-      
-      if (queryString) {
-        queryString.split('&').forEach(param => {
-          const [key, value] = param.split('=')
-          this.searchParams.set(key, decodeURIComponent(value || ''))
-        })
-      }
+    static json(data, init = {}) {
+      return new MockResponse(JSON.stringify(data), init)
     }
   },
 })
 
-// @ts-ignore
-global.describe = jest.requireActual('jest').describe
-global.it = jest.requireActual('jest').it
-global.expect = jest.requireActual('jest').expect
-global.beforeEach = jest.requireActual('jest').beforeEach
-global.afterEach = jest.requireActual('jest').afterEach
-global.jest = jest.requireActual('jest')
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({}),
+  })
+)

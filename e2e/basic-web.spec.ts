@@ -1,5 +1,10 @@
 import { test, expect } from '@playwright/test';
 
+if (typeof TransformStream === 'undefined') {
+  const { TransformStream } = require('node:stream/web');
+  global.TransformStream = TransformStream;
+}
+
 test.describe('Small Business Tracker - Basic Web Tests', () => {
   test.beforeEach(async ({ page }) => {
     test.setTimeout(60000);

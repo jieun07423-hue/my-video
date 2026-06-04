@@ -27,7 +27,7 @@ export function SyncStatusCard({ syncStatus }: SyncStatusCardProps) {
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
             statusColors[syncStatus.syncStatus as keyof typeof statusColors] ||
             'bg-gray-100 text-gray-800'
-          }`}>
+          }`} data-testid="sync-status-badge">
             {syncStatus.syncStatus}
           </span>
         </div>

@@ -49,4 +49,6 @@ export const notificationLogger = createChildLogger({ module: 'notification' });
 // 인증 로거
 export const authLogger = createChildLogger({ module: 'auth' });
 
+export const noteLogger = createChildLogger({ module: 'note' });
+
 export default logger;

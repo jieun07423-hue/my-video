@@ -1,49 +1,18 @@
+import { PrismaClient } from '@prisma/client';
 import { dbLogger } from '@/lib/logger';
 import type { CreateBusinessInput } from '@/lib/repositories/business.repository';
 
 const USE_REAL_DB = !!process.env.DATABASE_URL;
 
-interface MockBusinessDelegate {
-  createMany: (data: { data: CreateBusinessInput[] }) => Promise<{ count: number }>;
-  findMany: () => Promise<unknown[]>;
-  findUnique: (args: { where: { id?: string; bizesId?: string } }) => Promise<unknown | null>;
-  count: (args?: { where?: unknown }) => Promise<number>;
-  upsert: (args: unknown) => Promise<unknown>;
-  update: (args: unknown) => Promise<unknown>;
-}
+const mockBusinessData: any[] = [];
+const mockAdCampaigns: any[] = [];
+const mockAdCopies: any[] = [];
+const mockSeoulPermits: any[] = [];
+const mockSyncStates: any[] = [];
 
-interface MockSyncStateDelegate {
-  findUnique: (args: { where: { dataSource?: string } }) => Promise<unknown | null>;
-  update: (args: unknown) => Promise<unknown>;
-}
-
-interface MockAuditLogDelegate {
-  create: (args: unknown) => Promise<unknown>;
-  findMany: (args?: unknown) => Promise<unknown[]>;
-}
-
-interface MockAdminDelegate {
-  findUnique: (args: { where: { id?: string; email?: string } }) => Promise<unknown | null>;
-}
-
-interface DbDelegate {
-  business: MockBusinessDelegate;
-  syncState: MockSyncStateDelegate;
-  auditLog: MockAuditLogDelegate;
-  admin: MockAdminDelegate;
-  $connect: () => Promise<void>;
-  $disconnect: () => Promise<void>;
-}
-
-let db: DbDelegate;
-let testConnectionFn: () => Promise<boolean>;
-let disconnectDatabaseFn: () => Promise<void>;
-let staticBusinessRepo: unknown = null;
-let staticSyncStateRepo: unknown = null;
+let db: any;
 
 if (USE_REAL_DB) {
-  const { PrismaClient } = await import('@prisma/client');
-
   const prisma = new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
@@ -57,120 +26,136 @@ if (USE_REAL_DB) {
     syncState: prisma.syncState,
     auditLog: prisma.auditLog,
     admin: prisma.admin,
+    adCampaign: prisma.adCampaign,
+    adCopy: prisma.adCopy,
+    seoulPermit: prisma.seoulPermit,
     $connect: () => prisma.$connect(),
     $disconnect: () => prisma.$disconnect(),
   };
-
-  testConnectionFn = async () => {
-    try {
-      await prisma.$connect();
-      return true;
-    } catch (error) {
-      dbLogger.error({ error: error instanceof Error ? error.message : String(error) }, '데이터베이스 연결 테스트 실패');
-      return false;
-    }
-  };
-
-  disconnectDatabaseFn = async () => {
-    await prisma.$disconnect();
-  };
 } else {
-  const { staticBusinessRepository, staticSyncStateRepository } = await import('@/lib/db-static');
-  staticBusinessRepo = staticBusinessRepository;
-  staticSyncStateRepo = staticSyncStateRepository;
-
-  const mockBusinessData = [
-    {
-      id: '1',
-      bizesId: 'TEST001',
-      name: '테스트 상가 1',
-      roadNameAddress: '서울시 강남구 테헤란로 123',
-      lotNumberAddress: '서울시 강남구 역삼동 123-45',
-      phone: '02-123-4567',
-      latitude: 37.5172,
-      longitude: 127.0473,
-      businessCode: '12345',
-      businessName: '카페',
-      status: 'active' as const,
-      recordStatus: 'new' as const,
-      indsLclsCd: 'I',
-      indsLclsNm: '음식',
-      indsMclsCd: 'I12',
-      indsMclsNm: '커피',
-      indsSclsCd: 'I12A',
-      indsSclsNm: '카페',
-      dataSource: 'test',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      lastSyncedAt: new Date(),
-    },
-    {
-      id: '2',
-      bizesId: 'TEST002',
-      name: '테스트 상가 2',
-      roadNameAddress: '서울시 서초구 강남대로 456',
-      lotNumberAddress: '서울시 서초구 서초동 456-78',
-      phone: '02-987-6543',
-      latitude: 37.4847,
-      longitude: 127.0323,
-      businessCode: '54321',
-      businessName: '식당',
-      status: 'pending' as const,
-      recordStatus: 'synced' as const,
-      indsLclsCd: 'I',
-      indsLclsNm: '음식',
-      indsMclsCd: 'I11',
-      indsMclsNm: '한식',
-      indsSclsCd: 'I11A',
-      indsSclsNm: '일반한식',
-      dataSource: 'test',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      lastSyncedAt: new Date(),
-    },
-  ];
-
   db = {
     business: {
-      createMany: async (data: { data: CreateBusinessInput[] }) => {
-        dbLogger.info({ count: data.data.length }, 'Mock: 비즈니즈 대량 생성');
-        return { count: data.data.length };
+      createMany: async (args: { data: CreateBusinessInput[] }) => {
+        dbLogger.info({ count: args.data.length }, 'Mock: 비즈니스 대량 생성');
+        args.data.forEach(item => mockBusinessData.push({ ...item, id: item.bizesId }));
+        return { count: args.data.length };
       },
-      findMany: async () => mockBusinessData,
+      findMany: async (args: any) => mockBusinessData,
       findUnique: async (args: { where: { id?: string; bizesId?: string } }) => {
-        if (args.where.id) return mockBusinessData.find(b => b.id === args.where.id) || null;
-        if (args.where.bizesId) return mockBusinessData.find(b => b.bizesId === args.where.bizesId) || null;
+        if (args.where.id) return mockBusinessData.find((b: any) => b.id === args.where.id) || null;
+        if (args.where.bizesId) return mockBusinessData.find((b: any) => b.bizesId === args.where.bizesId) || null;
         return null;
       },
-      count: async () => mockBusinessData.length,
-      upsert: async () => ({ id: 'mock-upsert' }),
-      update: async () => ({ id: 'mock-update' }),
+      count: async (args: any) => mockBusinessData.length,
+      upsert: async (args: any) => ({ id: 'mock-upsert', ...args.create.data }),
+      update: async (args: any) => ({ id: args.where.id, ...args.data }),
+      delete: async (args: any) => ({ id: args.where.id }),
     },
     syncState: {
-      findUnique: async () => null,
-      update: async () => ({ id: 'mock-sync-update' }),
+      findUnique: async (args: any) => {
+        const dataSource = args.where?.dataSource || 'public-data-portal';
+        const state = mockSyncStates.find((s: any) => s.dataSource === dataSource);
+        return state || { id: '1', dataSource, syncStatus: 'idle' };
+      },
+      update: async (args: any) => {
+        const dataSource = args.where?.dataSource || 'public-data-portal';
+        const index = mockSyncStates.findIndex((s: any) => s.dataSource === dataSource);
+        const currentState = index !== -1 ? mockSyncStates[index] : { id: '1', dataSource, syncStatus: 'idle' };
+        const state = { ...currentState, ...args.data };
+        
+        if (index !== -1) {
+          mockSyncStates[index] = state;
+        } else {
+          mockSyncStates.push(state);
+        }
+        return state;
+      },
     },
     auditLog: {
-      create: async () => ({ id: 'mock-audit' }),
+      create: async (args: any) => ({ id: 'mock-audit', ...args.data }),
       findMany: async () => [],
     },
     admin: {
       findUnique: async () => null,
     },
-    $connect: async () => {},
+    adCampaign: {
+      create: async (args: { data: any }) => {
+        const campaign = { id: `mock-campaign-${Date.now()}`, ...args.data, createdAt: new Date(), updatedAt: new Date() };
+        mockAdCampaigns.push(campaign);
+        return campaign;
+      },
+      findUnique: async (args: { where: { id?: string } }) => {
+        return mockAdCampaigns.find((c: any) => c.id === args.where.id) || null;
+      },
+      update: async (args: { where: { id: string }; data: any }) => {
+        const campaign = mockAdCampaigns.find((c: any) => c.id === args.where.id);
+        if (campaign) return { ...campaign, ...args.data };
+        return null;
+      },
+      findMany: async () => mockAdCampaigns,
+      count: async (args: any) => mockAdCampaigns.length,
+    },
+    adCopy: {
+      createMany: async (args: { data: any[] }) => {
+        args.data.forEach((copy: any, idx: number) => {
+          mockAdCopies.push({ id: `mock-copy-${Date.now()}-${idx}`, ...copy });
+        });
+        return { count: args.data.length };
+      },
+      findMany: async () => mockAdCopies,
+    },
+    note: {
+      create: async (args: { data: any }) => {
+        const note = { id: `mock-note-${Date.now()}`, ...args.data, createdAt: new Date(), updatedAt: new Date() };
+        mockBusinessData.push(note);
+        return note;
+      },
+      findMany: async () => mockBusinessData.filter((b: any) => b.content),
+      update: async (args: { where: { id: string }; data: any }) => {
+        const note = mockBusinessData.find((b: any) => b.id === args.where.id);
+        if (note) return { ...note, ...args.data };
+        return null;
+      },
+      delete: async (args: { where: { id: string } }) => {
+        return { id: args.where.id };
+      },
+      count: async () => mockBusinessData.filter((b: any) => b.content).length,
+    },
+    seoulPermit: {
+      findUnique: async (args: { where: { id?: string } }) => {
+        return mockSeoulPermits.find((p: any) => p.id === args.where.id) || null;
+      },
+      upsert: async (args: any) => ({ id: 'mock-permit', ...args.create.data }),
+      findMany: async () => mockSeoulPermits,
+      count: async () => mockSeoulPermits.length,
+      groupBy: async () => [{ serviceCode: 'S001', _count: 10 }],
+    },
+    $connect: async () => {
+      dbLogger.info('정적 데이터베이스 모드 사용 중');
+    },
     $disconnect: async () => {},
   };
-
-  testConnectionFn = async () => {
-    dbLogger.info('정적 데이터베이스 모드 사용 중');
-    return true;
-  };
-
-  disconnectDatabaseFn = async () => {};
 }
 
 export default db;
-export const testConnection = testConnectionFn;
-export const disconnectDatabase = disconnectDatabaseFn;
-export const staticBusinessRepository = staticBusinessRepo;
-export const staticSyncStateRepository = staticSyncStateRepo;
+
+export const resetMockData = () => {
+  mockBusinessData.length = 0
+  mockAdCampaigns.length = 0
+  mockAdCopies.length = 0
+  mockSeoulPermits.length = 0
+  mockSyncStates.length = 0
+}
+
+export const testConnection = async () => {
+  try {
+    await db.$connect();
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const disconnectDatabase = async () => {
+  await db.$disconnect();
+};

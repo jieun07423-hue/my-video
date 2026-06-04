@@ -40,12 +40,12 @@ function BusinessTable({ businesses, isLoading }: { businesses: any[]; isLoading
         {Array.from({ length: 5 }).map((_, index) => (
           <div key={index} className="bg-white rounded-xl p-6 animate-pulse">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-slate-200 rounded-lg"></div>
+              <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-slate-200 rounded w-1/3"></div>
-                <div className="h-3 bg-slate-200 rounded w-1/2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
               </div>
-              <div className="w-24 h-8 bg-slate-200 rounded"></div>
+              <div className="w-24 h-8 bg-gray-200 rounded"></div>
             </div>
           </div>
         ))}
@@ -54,41 +54,41 @@ function BusinessTable({ businesses, isLoading }: { businesses: any[]; isLoading
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-200">
+          <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 <div className="flex items-center space-x-2">
                   <Building2 className="w-4 h-4" />
                   <span>상호명</span>
                 </div>
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 <div className="flex items-center space-x-2">
                   <MapPin className="w-4 h-4" />
                   <span>주소</span>
                 </div>
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 업종
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 상태
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 <div className="flex items-center space-x-2">
                   <Calendar className="w-4 h-4" />
                   <span>등록일</span>
                 </div>
               </th>
-              <th className="px-6 py-4 text-center text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 상세
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-gray-50">
             {businesses.map((business, index) => (
               <BusinessTableRow 
                 key={business.id} 
@@ -146,7 +146,7 @@ function Pagination({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronLeft className="w-4 h-4" />
       </button>
@@ -154,14 +154,14 @@ function Pagination({
       {pages.map((page, index) => (
         <div key={index}>
           {page === '...' ? (
-            <span className="px-3 py-2 text-slate-400">...</span>
+            <span className="px-3 py-2 text-gray-400">...</span>
           ) : (
             <button
               onClick={() => onPageChange(page as number)}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+              className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                 currentPage === page
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
               {page}
@@ -173,7 +173,7 @@ function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronRight className="w-4 h-4" />
       </button>
@@ -209,18 +209,18 @@ export default function BusinessesPage() {
 
   if (error && !isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="min-h-screen bg-gray-50">
         <Navbar />
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="text-center py-20">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-6">
               <AlertCircle className="w-8 h-8 text-red-600" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">오류가 발생했습니다</h2>
-            <p className="text-slate-600 mb-6">{String(error)}</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">오류가 발생했습니다</h2>
+            <p className="text-gray-600 mb-6">{String(error)}</p>
             <button
               onClick={() => window.location.reload()}
-              className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center space-x-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-all shadow-lg"
             >
               <RefreshCw className="w-4 h-4" />
               <span>다시 시도</span>
@@ -232,28 +232,28 @@ export default function BusinessesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold text-gray-900">
                 소상공인 목록
               </h1>
-              <p className="text-slate-600 mt-2">전체 {stats.total.toLocaleString()}개 업체</p>
+              <p className="text-gray-500 mt-2">전체 {stats.total.toLocaleString()}개 업체</p>
             </div>
             <div className="flex items-center space-x-3">
               <button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition-all"
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-all"
               >
                 <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                 <span>새로고침</span>
               </button>
-              <button className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md hover:shadow-lg">
+              <button className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg">
                 <Download className="w-4 h-4" />
                 <span>내보내기</span>
               </button>
@@ -300,38 +300,38 @@ export default function BusinessesPage() {
           />
         </div>
 
-        <div className="mb-8 bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
+        <div className="mb-8 bg-white rounded-2xl shadow-md border border-gray-100 p-6">
           <div className="flex items-center mb-6">
-            <Filter className="w-5 h-5 text-slate-500 mr-2" />
-            <h2 className="text-lg font-semibold text-slate-900">검색 필터</h2>
+            <Filter className="w-5 h-5 text-gray-500 mr-2" />
+            <h2 className="text-lg font-semibold text-gray-900">검색 필터</h2>
           </div>
           
           <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-gray-700">
                   검색어
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
                     value={searchParams.search || ''}
                     onChange={(e) => setSearchParams({ ...searchParams, search: e.target.value })}
                     placeholder="상호명, 주소, 업종 검색"
-                    className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-gray-700">
                   영업 상태
                 </label>
                 <select
                   value={searchParams.status || ''}
                   onChange={(e) => setSearchParams({ ...searchParams, status: e.target.value as any })}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                 >
                   <option value="">전체 상태</option>
                   <option value="pending">대기</option>
@@ -342,13 +342,13 @@ export default function BusinessesPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                <label className="mb-2 block text-sm font-semibold text-gray-700">
                   레코드 상태
                 </label>
                 <select
                   value={searchParams.recordStatus || ''}
                   onChange={(e) => setSearchParams({ ...searchParams, recordStatus: e.target.value as any })}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                 >
                   <option value="">전체 상태</option>
                   <option value="new">신규</option>
@@ -360,7 +360,7 @@ export default function BusinessesPage() {
               <div className="flex items-end space-x-2">
                 <button
                   type="submit"
-                  className="flex-1 inline-flex items-center justify-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md hover:shadow-lg"
+                  className="flex-1 inline-flex items-center justify-center space-x-2 px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-all shadow-lg"
                 >
                   <Search className="w-4 h-4" />
                   <span>검색</span>
@@ -371,12 +371,12 @@ export default function BusinessesPage() {
         </div>
 
         {businesses.length === 0 && !isLoading ? (
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-16 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-100 rounded-full mb-6">
-              <Search className="w-8 h-8 text-slate-400" />
+          <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-16 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-6">
+              <Search className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">검색 결과가 없습니다</h3>
-            <p className="text-slate-600">다른 검색 조건으로 시도해보세요.</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">검색 결과가 없습니다</h3>
+            <p className="text-gray-500">다른 검색 조건으로 시도해보세요.</p>
           </div>
         ) : (
           <>

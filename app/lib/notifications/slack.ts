@@ -180,10 +180,49 @@ export async function notifyError(error: string, context?: Record<string, unknow
   notificationLogger.error({ error, context }, '오류 Slack 알림 전송');
 }
 
+export async function notifyN8nWorkflow(data: Record<string, unknown>) {
+  const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
+  const N8N_WEBHOOK_SECRET = process.env.N8N_WEBHOOK_SECRET;
+  
+  if (!N8N_WEBHOOK_URL) {
+    notificationLogger.warn('N8N_WEBHOOK_URL 환경변수가 설정되지 않음');
+    return;
+  }
+  
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (N8N_WEBHOOK_SECRET) {
+      headers['X-N8N-Secret'] = N8N_WEBHOOK_SECRET;
+    }
+    
+    const response = await fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        source: 'small-business-tracker',
+        timestamp: new Date().toISOString(),
+        ...data,
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`n8n 웹훅 호출 실패: ${response.status}`);
+    }
+    
+    notificationLogger.info({ url: N8N_WEBHOOK_URL }, 'n8n 워크플로우 알림 전송 성공');
+  } catch (error) {
+    notificationLogger.error({ error: error.message }, 'n8n 워크플로우 알림 전송 실패');
+  }
+}
+
 export default {
   notifyNewBusiness,
   notifySyncStart,
   notifySyncComplete,
   notifySyncError,
   notifyError,
+  notifyN8nWorkflow,
 };

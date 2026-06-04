@@ -1,5 +1,5 @@
 import { syncLogger } from '@/lib/logger';
-import { staticSyncStateRepository } from '@/lib/db-static';
+import db from '@/lib/db';
 
 export interface SyncStateUpdate {
   syncStatus?: 'idle' | 'running' | 'success' | 'failed';
@@ -13,11 +13,13 @@ export interface SyncStateUpdate {
 
 export class SyncStateRepository {
   async getSyncState(dataSource: string = 'public-data-portal') {
-    return await staticSyncStateRepository.getSyncState();
+    return await db.syncState.findUnique({
+      where: { dataSource },
+    }) || { id: '1', dataSource, syncStatus: 'idle' };
   }
 
   async createSyncState(dataSource: string = 'public-data-portal') {
-    const syncState = await staticSyncStateRepository.getSyncState();
+    const syncState = await this.getSyncState(dataSource);
     syncLogger.info({ dataSource }, '동기화 상태 생성');
     return syncState;
   }
@@ -27,7 +29,10 @@ export class SyncStateRepository {
     update: SyncStateUpdate
   ) {
     syncLogger.info({ dataSource, update }, '동기화 상태 업데이트');
-    return await staticSyncStateRepository.getSyncState();
+    return await db.syncState.update({
+      where: { dataSource },
+      data: update,
+    });
   }
 
   async setRunning(dataSource: string = 'public-data-portal') {

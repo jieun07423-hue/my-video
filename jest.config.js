@@ -1,7 +1,6 @@
 const nextJest = require('next/jest')
 
 const createJestConfig = nextJest({
-  // Next.js 앱 루트 경로를 제공
   dir: './',
 })
 
@@ -17,11 +16,11 @@ const customJestConfig = {
   },
   transformIgnorePatterns: [
     'node_modules/(?!(axios)/)',
+    '^.+\\.module\\.(css|sass|scss)$',
   ],
   collectCoverageFrom: [
     'app/**/*.{js,jsx,ts,tsx}',
-    'components/**/*.{js,jsx,ts,tsx}',
-    'lib/**/*.{js,jsx,ts,tsx}',
+    'app/lib/**/*.{js,jsx,ts,tsx}',
     '!app/**/*.d.ts',
     '!app/**/*.stories.{js,jsx,ts,tsx}',
     '!app/**/*.test.{js,jsx,ts,tsx}',
@@ -36,16 +35,7 @@ const customJestConfig = {
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
     '<rootDir>/app/generated/prisma/',
-    '<rootDir>/__tests__/test-utils.tsx',
   ],
-  transformIgnorePatterns: [
-    '/node_modules/',
-    '^.+\\.module\\.(css|sass|scss)$',
-  ],
-  // API 라우트 테스트를 위한 설정
-  testEnvironmentOptions: {
-    customExportConditions: ['', 'node', 'node-addons'],
-  },
 }
 
 module.exports = createJestConfig(customJestConfig)

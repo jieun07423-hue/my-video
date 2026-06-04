@@ -1,6 +1,36 @@
 import { dbLogger, syncLogger } from '@/lib/logger';
 import type { CreateBusinessInput, SearchOptions } from '@/lib/repositories/business.repository';
 
+const mockNotes = [
+  {
+    id: 'note-1',
+    businessId: '1',
+    title: '중요 메모',
+    content: '이 상가는 매우 중요합니다. 관리자 확인 필요.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    deletedAt: null,
+  },
+  {
+    id: 'note-2',
+    businessId: '2',
+    title: '체크리스트',
+    content: '1. 소방 시설 점검\n2. 전기 안전 점검\n3. 가스 누출 확인',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    deletedAt: new Date().toISOString(),
+  },
+  {
+    id: 'note-3',
+    businessId: '1',
+    title: '임시 메모',
+    content: '이 메모는 나중에 삭제될 예정입니다.',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    deletedAt: null,
+  },
+];
+
 const mockBusinesses = [
   {
     id: '1',
@@ -183,5 +213,55 @@ class StaticSyncStateRepository {
   }
 }
 
+class StaticNoteRepository {
+  async create(data: { businessId: string; title?: string; content: string }) {
+    dbLogger.info({ businessId: data.businessId }, '노트 생성 시작');
+    const note = {
+      id: `note-${Date.now()}`,
+      businessId: data.businessId,
+      title: data.title || null,
+      content: data.content,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      deletedAt: null,
+    };
+    mockNotes.push(note);
+    dbLogger.info({ noteId: note.id }, '노트 생성 완료');
+    return note;
+  }
+
+  async findDeleted() {
+    return mockNotes.filter(n => n.deletedAt !== null);
+  }
+
+  async softDelete(id: string) {
+    const note = mockNotes.find(n => n.id === id);
+    if (note) {
+      note.deletedAt = new Date().toISOString();
+      dbLogger.info({ noteId: id }, '노트 소프트 삭제 완료');
+    }
+    return note;
+  }
+
+  async restore(id: string) {
+    const note = mockNotes.find(n => n.id === id);
+    if (note) {
+      note.deletedAt = null;
+      dbLogger.info({ noteId: id }, '노트 복원 완료');
+    }
+    return note;
+  }
+
+  async permanentDelete(id: string) {
+    const index = mockNotes.findIndex(n => n.id === id);
+    if (index !== -1) {
+      mockNotes.splice(index, 1);
+      dbLogger.info({ noteId: id }, '노트 영구 삭제 완료');
+    }
+    return index !== -1;
+  }
+}
+
 export const staticBusinessRepository = new StaticBusinessRepository();
 export const staticSyncStateRepository = new StaticSyncStateRepository();
+export const staticNoteRepository = new StaticNoteRepository();

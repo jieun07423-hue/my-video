@@ -40,7 +40,7 @@ export function StatCard({
       border: 'border-blue-200',
       text: 'text-blue-900',
       accent: 'text-blue-600',
-      icon: 'from-blue-500 to-blue-600',
+      icon: 'from-blue-500 to-indigo-500',
       glow: 'shadow-blue-200'
     },
     green: {
@@ -48,7 +48,7 @@ export function StatCard({
       border: 'border-green-200',
       text: 'text-green-900',
       accent: 'text-green-600',
-      icon: 'from-green-500 to-emerald-600',
+      icon: 'from-green-500 to-emerald-500',
       glow: 'shadow-green-200'
     },
     yellow: {
@@ -56,7 +56,7 @@ export function StatCard({
       border: 'border-amber-200',
       text: 'text-amber-900',
       accent: 'text-amber-600',
-      icon: 'from-amber-400 to-yellow-500',
+      icon: 'from-amber-400 to-orange-500',
       glow: 'shadow-amber-200'
     },
     purple: {
@@ -64,7 +64,7 @@ export function StatCard({
       border: 'border-purple-200',
       text: 'text-purple-900',
       accent: 'text-purple-600',
-      icon: 'from-purple-500 to-violet-600',
+      icon: 'from-purple-500 to-violet-500',
       glow: 'shadow-purple-200'
     },
     amber: {
@@ -89,17 +89,17 @@ export function StatCard({
       className={clsx(
         'relative group cursor-pointer transition-all duration-500 ease-out',
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
-        isHovered ? 'scale-105' : 'scale-100'
+        isHovered ? 'scale-[1.02]' : 'scale-100'
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{ transitionDelay: `${delay}ms` }}
     >
       <div className={clsx(
-        'relative overflow-hidden rounded-2xl border border-opacity-20 p-6 backdrop-blur-sm',
+        'relative overflow-hidden rounded-2xl border p-6',
         colors.bg,
         colors.border,
-        isHovered ? `shadow-2xl ${colors.glow}` : 'shadow-lg'
+        isHovered ? `shadow-lg ${colors.glow}` : 'shadow-md'
       )}>
 
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br opacity-10 rounded-full blur-2xl transform translate-x-16 -translate-y-16 transition-all duration-500 group-hover:scale-150"></div>
@@ -109,7 +109,7 @@ export function StatCard({
           <div className="absolute top-4 right-4">
             <div className={clsx(
               'relative p-3 rounded-xl bg-white shadow-md transition-all duration-300',
-              isHovered ? 'shadow-xl scale-110' : ''
+              isHovered ? 'shadow-lg scale-110' : ''
             )}>
               <div className={clsx(
                 'absolute inset-0 bg-gradient-to-br rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300',

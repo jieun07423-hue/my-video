@@ -9,6 +9,7 @@ declare module 'next-auth' {
     user: {
       id: string
       email: string
+      role: string
     }
   }
 }
@@ -46,6 +47,7 @@ const credentialsProvider = Credentials({
         id: admin.id,
         email: admin.email,
         name: admin.name,
+        role: admin.role,
       }
     } catch (error) {
       console.error('Auth error:', error)
@@ -96,6 +98,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id
         token.email = user.email
+        token.role = (user as { role?: string }).role || 'admin'
       }
       return token
     },
@@ -103,17 +106,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token) {
         session.user.id = token.id as string
         session.user.email = token.email as string
+        session.user.role = token.role as string
       }
       return session
     },
   },
 })
-
-declare module 'next-auth' {
-  interface Session {
-    user: {
-      id: string
-      email: string
-    }
-  }
-}

@@ -1,11 +1,16 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Send, Sparkles, Zap, ArrowRight } from 'lucide-react';
+import { Send, Sparkles, Zap, ArrowRight, Bot } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useSpeechRecognition } from '@/lib/hooks/useSpeechRecognition';
 import { useSpeechSynthesis } from '@/lib/hooks/useSpeechSynthesis';
 import { VoiceButton, ListeningAnimation, GenieChat, ChatMessage } from '@/components/genie';
+
+const DEFAULT_SYSTEM_PROMPT = `You are Genie, a helpful AI assistant for a small business tracker application.
+You help users find and analyze business data from the Korean government public data portal.
+When users ask about businesses, statistics, or analysis, guide them appropriately.
+Keep responses brief and friendly in Korean.`;
 
 // 날짜 파싱 함수
 function parseDate(text: string): string | null {
@@ -228,6 +233,33 @@ function generateResponse(intent: string, entities: Record<string, string>, anal
   }
 }
 
+// Ollama 채팅 함수
+async function chatWithOllama(messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>): Promise<string> {
+  try {
+    const response = await fetch('/api/ollama/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages,
+        temperature: 0.7,
+        top_p: 0.9,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.status !== 'success') {
+      console.error('Ollama error:', result.message);
+      return '죄송합니다. AI 응답을 생성하는 데 문제가 발생했습니다.';
+    }
+
+    return result.data?.message?.content || '응답을 생성할 수 없습니다.';
+  } catch (error) {
+    console.error('Ollama chat error:', error);
+    return '죄송합니다. 연결 문제가 발생했습니다. 나중에 다시 시도해 주세요.';
+  }
+}
+
 // Quick suggestion prompts
 const SUGGESTIONS = [
   { text: '오늘 사업자 분석', icon: '📅' },
@@ -318,21 +350,20 @@ export default function GeniePage() {
 
     // Intent detection
     const { intent, entities, analysisType } = detectIntent(messageText);
-    const initialResponse = generateResponse(intent, entities, analysisType);
 
-    const assistantMessage: ChatMessage = {
-      id: `${Date.now() + 1}`,
-      role: 'assistant',
-      content: initialResponse,
-      timestamp: new Date(),
-    };
-
-    setMessages(prev => [...prev, assistantMessage]);
-
-    // If analysis intent, call API
+    // 분석 intent인 경우 기존 로직 사용
     if (intent === 'analyze' && analysisType) {
-      setIsProcessing(true);
-      
+      const initialResponse = generateResponse(intent, entities, analysisType);
+
+      const assistantMessage: ChatMessage = {
+        id: `${Date.now() + 1}`,
+        role: 'assistant',
+        content: initialResponse,
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+
       // Get real analysis result
       const analysisResult = await callAnalyzeAPI(analysisType, entities);
       
@@ -349,10 +380,28 @@ export default function GeniePage() {
         }
         return updated;
       });
+    } else {
+      // 일반 대화: Ollama 사용
+      const conversationHistory = [
+        { role: 'system' as const, content: DEFAULT_SYSTEM_PROMPT },
+        ...messages.slice(-10).map(m => ({ role: m.role as 'system' | 'user' | 'assistant', content: m.content })),
+        { role: 'user' as const, content: messageText },
+      ];
+
+      const ollamaResponse = await chatWithOllama(conversationHistory);
+
+      const assistantMessage: ChatMessage = {
+        id: `${Date.now() + 1}`,
+        role: 'assistant',
+        content: ollamaResponse,
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
     }
 
     setIsProcessing(false);
-  }, [inputText, speak]);
+  }, [inputText, speak, messages]);
 
   // Handle keyboard submit
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {

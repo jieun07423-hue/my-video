@@ -42,6 +42,25 @@ export interface OllamaModel {
 
 export const ollamaModels: OllamaModel[] = [
   {
+    id: 'glm-4.7',
+    name: 'GLM-4.7 (Z.AI Coding Plan)',
+    family: 'glm',
+    api: { id: 'glm-4.7', url: 'https://api.z.ai/api/coding/paas/v4', npm: '@ai-sdk/openai-compatible' },
+    status: 'active',
+    cost: { input: 0, output: 0, cache: { read: 0, write: 0 } },
+    limit: { context: 200000, output: 16384 },
+    capabilities: {
+      reasoning: true,
+      attachment: false,
+      toolcall: true,
+      input: { text: true, audio: false, image: false, video: false, pdf: false },
+      output: { text: true, audio: false, image: false, video: false, pdf: false },
+      interleaved: false,
+    },
+    releaseDate: '2025-01-01',
+    variants: {},
+  },
+  {
     id: 'minimax-m2.7',
     name: 'MiniMax M2.7',
     family: 'minimax',

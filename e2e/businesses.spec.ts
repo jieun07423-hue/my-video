@@ -1,8 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { businessRepository } from '@/app/lib/repositories/business.repository';
-import { apiLogger } from '@/app/lib/logger';
+import { apiLogger } from '../app/lib/logger';
+
+if (typeof TransformStream === 'undefined') {
+  const { TransformStream } = require('node:stream/web');
+  global.TransformStream = TransformStream;
+}
 
 test.describe('Small Business Tracker E2E Tests', () => {
+
   test.beforeEach(async ({ page }) => {
     // 로그인 페이지로 이동
     await page.goto('http://localhost:3000/auth/signin');

@@ -48,11 +48,10 @@ export async function PUT(
     const { id } = params;
     const body = await request.json();
 
-    // Note: 현재 정적 데이터베이스에서는 수정이 완전히 지원되지 않음
-    // 실제 Prisma 데이터베이스에서는 db.business.update 사용
-    apiLogger.info({ id, updates: Object.keys(body) }, '소상공인 수정 요청');
+    const updatedBusiness = await businessRepository.update(id, body);
+    apiLogger.info({ id }, '소상공인 수정 성공');
 
-    return NextResponse.json({ message: '수정 성공', id, ...body } as any);
+    return NextResponse.json(updatedBusiness);
   } catch (error) {
     apiLogger.error({ error: error instanceof Error ? error.message : String(error) }, '소상공인 수정 실패');
     return createApiErrorResponse(error, '수정 실패', 400);
@@ -69,11 +68,10 @@ export async function DELETE(
   try {
     const { id } = params;
 
-    // Note: 현재 정적 데이터베이스에서는 삭제가 지원되지 않음
-    // 실제 Prisma 데이터베이스에서는 db.business.delete 사용
-    apiLogger.info({ id }, '소상공인 삭제 요청');
+    await businessRepository.delete(id);
+    apiLogger.info({ id }, '소상공인 삭제 성공');
 
-    return NextResponse.json({ message: '삭제 성공', id } as any);
+    return NextResponse.json({ message: '삭제 성공', id });
   } catch (error) {
     apiLogger.error({ error: error instanceof Error ? error.message : String(error) }, '소상공인 삭제 실패');
     return createApiErrorResponse(error, '삭제 실패', 400);

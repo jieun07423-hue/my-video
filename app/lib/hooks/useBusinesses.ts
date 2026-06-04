@@ -3,9 +3,14 @@ import { businessRepository } from '@/lib/repositories/business.repository';
 import type { SearchOptions } from '@/lib/repositories/business.repository';
 
 export function useBusinesses(options: SearchOptions = {}) {
+  const mergedOptions = {
+    page: 1,
+    limit: 20,
+    ...options,
+  };
   return useQuery({
-    queryKey: ['businesses', options],
-    queryFn: () => businessRepository.search(options),
+    queryKey: ['businesses', mergedOptions],
+    queryFn: () => businessRepository.search(mergedOptions),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

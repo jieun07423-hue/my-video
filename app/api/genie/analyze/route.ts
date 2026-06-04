@@ -70,15 +70,23 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  const { fetchIndustryCategories, fetchRegions } = await import('@/lib/api/public-data-client');
+  try {
+    const { fetchIndustryCategories, fetchRegions } = await import('@/lib/api/public-data-client');
 
-  const [categories, regions] = await Promise.all([
-    fetchIndustryCategories(),
-    fetchRegions(),
-  ]);
+    const [categories, regions] = await Promise.all([
+      fetchIndustryCategories(),
+      fetchRegions(),
+    ]);
 
-  return NextResponse.json({
-    categories,
-    regions,
-  });
+    return NextResponse.json({
+      categories,
+      regions,
+    });
+  } catch (error) {
+    console.error('분석 목록 조회 오류:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : '분석 목록 조회 중 오류가 발생했습니다' },
+      { status: 500 }
+    );
+  }
 }

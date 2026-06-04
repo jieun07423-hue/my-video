@@ -29,13 +29,20 @@ enum RecordStatus {
   verified      // 검증됨
 }
 
-// 어드민 사용자
+// 어드민 사용자 권한
+enum AdminRole {
+  super_admin  // 최고 관리자
+  admin        // 관리자
+  viewer       // 조회자
+}
+
 model Admin {
   id           String   @id @default(cuid())
   username     String   @unique
   passwordHash String   @map("password_hash")
   name         String
   email        String?
+  role         AdminRole @default(admin) @map("role")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
@@ -78,7 +85,8 @@ model Business {
   dataSource        String?        @map("data_source") // 데이터 출처
   externalId        String?        @map("external_id") // 외부 시스템 ID
 
-  auditLogs         AuditLog[]
+   auditLogs         AuditLog[]
+  notes             Note[]   // 비즈니스에 속한 노트들
 
   @@index([recordStatus, createdAt(sort: Desc)])
   @@index([status, createdAt(sort: Desc)])
@@ -123,4 +131,131 @@ model AuditLog {
   @@index([businessId, createdAt(sort: Desc)])
   @@index([action, createdAt(sort: Desc)])
   @@map("audit_logs")
+}
+
+// 광고 캠페인 상태
+enum AdCampaignStatus {
+  pending    // 대기중
+  generating // 생성중
+  completed  // 완료
+  failed     // 실패
+}
+
+// 광고 카피 품질 등급
+enum AdCopyQuality {
+  high       // 상 - 최종 추천
+  medium     // 중 -备选
+  low        // 하 - 제외
+}
+
+// 광고 캠페인
+model AdCampaign {
+  id            String           @id @default(cuid())
+  userId        String?          @map("user_id") // Telegram user ID
+  industry      String           @map("industry") // 업종 (치과, 부동산 등)
+  location      String           @map("location") // 지역 (강남, 잠실 등)
+  target        String?          @map("target") // 타겟 (30대 여성 등)
+  goal          String?          @map("goal") // 목표 (예약 유도 등)
+  strengths    String?          @map("strengths") // 강점 (통증 최소화 등)
+  keywords      String[]         @map("keywords") // 키워드列表
+  tone          String?          @map("tone") // 톤 (신뢰, 전문 등)
+  status        AdCampaignStatus @default(pending)
+  totalCopies   Int              @default(0) @map("total_copies")
+  selectedCount Int             @default(0) @map("selected_count")
+  
+  // Telegram 전송 정보
+  telegramChatId String?        @map("telegram_chat_id")
+  telegramMessageId String?     @map("telegram_message_id")
+  
+  // 블로그 연동 정보
+  blogPosted    Boolean          @default(false) @map("blog_posted")
+  blogPostUrl   String?          @map("blog_post_url")
+  
+  // 오류 정보
+  errorMessage  String?          @map("error_message")
+  
+  // 타임스탬프
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+  completedAt   DateTime?        @map("completed_at")
+  
+  // 연관
+  copies        AdCopy[]
+  
+  @@index([status, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("ad_campaigns")
+}
+
+// 광고 카피
+model AdCopy {
+  id            String          @id @default(cuid())
+  campaignId    String          @map("campaign_id")
+  content       String          @map("content") // 광고 카피 내용
+  rank          Int             @map("rank") // 순위 (1-20)
+  quality       AdCopyQuality? @map("quality") // 품질 등급 (필터링 후)
+  isSelected    Boolean         @default(false) @map("is_selected") // 최종 선택됨
+  filterStage   String?         @map("filter_stage") // 필터링 단계 (initial, filtered, final)
+  
+  // 메타데이터
+  charCount     Int?            @map("char_count")
+  hasCta        Boolean?        @map("has_cta") // CTA 포함 여부
+  
+  // 타임스탬프
+  createdAt     DateTime        @default(now()) @map("created_at")
+  
+  // 연관
+  campaign      AdCampaign      @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  @@index([campaignId, rank])
+  @@map("ad_copies")
+}
+
+// 서울시 인허가 정보
+model SeoulPermit {
+  id                String    @id @default(cuid())
+  manageNo          String    @unique @map("manage_no") // 관리번호
+  bplcNm            String    @map("bplc_nm") // 사업장명
+  bpNm              String?   @map("bp_nm") // 사업자명
+  bizcnd            String?   @map("bizcnd") // 업종
+  locplcd           String?   @map("locplcd") // 소재지
+  rdnWhladdr        String?   @map("rdn_whladdr") // 도로명주소
+  siteTel           String?   @map("site_tel") // 전화번호
+  apvPermYmd        String?   @map("apv_perm_ymd") // 인허가일자
+  apvCancelYmd      String?   @map("apv_cancel_ymd") // 인허가취소일자
+  trdStateGbn       String?   @map("trd_state_gbn") // 영업상태코드
+  trdStateNm       String?   @map("trd_state_nm") // 영업상태명
+  dtlStateGbn      String?   @map("dtl_state_gbn") // 상세영업상태코드
+  dtlStateNm       String?   @map("dtl_state_nm") // 상세영업상태명
+  dcbyYmd           String?   @map("dcby_ymd") // 폐업일자
+  sitePostNo        String?   @map("site_post_no") // 우편번호
+  xCoord            Decimal?  @map("x_coord") @db.Decimal(15, 6)
+  yCoord            Decimal?  @map("y_coord") @db.Decimal(15, 6)
+  serviceCode       String    @default("LOCALDATA_031001") @map("service_code")
+  
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  @@index([serviceCode, trdStateNm])
+  @@index([bplcNm])
+  @@index([createdAt(sort: Desc)])
+  @@map("seoul_permits")
+}
+
+// 노트 (소프트 삭제 지원)
+model Note {
+  id          String   @id @default(cuid())
+  businessId  String   @map("business_id") // 소속 비즈니스 ID
+  title       String?  // 노트 제목 (선택)
+  content     String   // 노트 내용
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at") // 소프트 삭제 시간 (null이면 활성)
+
+  // 관계
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, deletedAt])
+  @@index([deletedAt])
+  @@map("notes")
 }

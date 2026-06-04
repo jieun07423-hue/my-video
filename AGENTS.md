@@ -14,13 +14,16 @@ npm start                      # Production server
 npm run lint                   # ESLint check
 
 # Database
-npx prisma generate            # Generate Prisma client (outputs to app/generated/prisma)
+npx prisma generate            # Generate Prisma client (default: node_modules/.prisma/client)
 npx prisma migrate dev         # Run migrations
 npx prisma studio              # Database viewer
 npm run prisma:seed           # Seed database (tsx prisma/seed.ts)
 
 # Testing
-# Status: No test framework configured (Playwright installed but not configured)
+npm run test                    # Run all Jest tests
+npm run test:watch             # Watch mode for development
+npm run test:coverage          # Generate coverage report
+npm run test:single            # `npm run test:single "test name"`
 ```
 
 ## Code Style Guidelines
@@ -162,8 +165,12 @@ enum RecordStatus { new, synced, verified }
 
 ```typescript
 generator client {
-  provider = "prisma-client"
-  output   = "app/generated/prisma"  // Custom location
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 ```
 

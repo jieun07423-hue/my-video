@@ -1,5 +1,7 @@
 'use client';
 
+import { windowUtils } from '@/lib/utils/window';
+
 export function ManualSyncCard() {
   async function handleManualSync() {
     try {
@@ -10,7 +12,7 @@ export function ManualSyncCard() {
 
       if (data.success) {
         alert('동기화가 시작되었습니다.');
-        window.location.reload();
+        windowUtils.reloadPage();
       } else {
         alert(`동기화 실패: ${data.message}`);
       }
