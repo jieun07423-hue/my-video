@@ -8,7 +8,7 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 interface StatCardProps {
   title: string;
   value: number;
-  color?: 'blue' | 'green' | 'yellow' | 'purple' | 'amber';
+  color?: 'blue' | 'green' | 'yellow' | 'purple' | 'amber' | 'red';
   icon?: string;
   trend?: 'up' | 'down' | 'neutral';
   trendValue?: number;
@@ -74,10 +74,17 @@ export function StatCard({
       accent: 'text-amber-600',
       icon: 'from-amber-400 to-orange-500',
       glow: 'shadow-amber-200'
+    },
+    red: {
+      bg: 'bg-gradient-to-br from-red-50 to-rose-100',
+      border: 'border-red-200',
+      text: 'text-red-900',
+      accent: 'text-red-600',
+      icon: 'from-red-500 to-rose-500',
+      glow: 'shadow-red-200'
     }
   };
-
-  const colors = colorConfig[color];
+  const colors = colorConfig[color] ?? colorConfig.blue;
 
   const formatTrendValue = (val: number) => {
     if (val >= 1000) return `${(val / 1000).toFixed(1)}k`;
