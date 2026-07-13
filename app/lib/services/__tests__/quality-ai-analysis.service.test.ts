@@ -7,7 +7,7 @@ import {
   getAnalysisHistory,
   getAnalysisStats,
   generateAIAnalysisReport,
-} from '../quality-ai-analysis.service';
+} from '../quality/quality-ai-analysis.service';
 
 describe('QualityAIAnalysisService', () => {
   beforeEach(() => {

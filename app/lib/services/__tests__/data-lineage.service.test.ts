@@ -6,7 +6,7 @@ import {
   getFieldLineage,
   generateLineageReport,
   exportLineage,
-} from '../data-lineage.service';
+} from '../quality/data-lineage.service';
 
 describe('DataLineageService', () => {
   const mockBusinessId = '1234567890';

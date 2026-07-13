@@ -35,6 +35,8 @@ const customJestConfig = {
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
     '<rootDir>/app/generated/prisma/',
+    '<rootDir>/__tests__/test-utils.tsx',
+    '<rootDir>/e2e/',
   ],
 }
 

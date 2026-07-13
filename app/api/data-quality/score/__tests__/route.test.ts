@@ -1,8 +1,11 @@
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { businessRepository } from '@/lib/repositories/business.repository';
-import { calculateQualityScore, getScoreHistory, getScoreStats, setScoringConfig } from '@/lib/services/quality-scoring.service';
+jest.mock('../../../../lib/repositories/business.repository', () => ({
+  businessRepository: {
+    findByBizesId: jest.fn(),
+  },
+}));
 
-jest.mock('@/lib/repositories/business.repository');
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { calculateQualityScore, getScoreHistory, getScoreStats, setScoringConfig } from '../../../../lib/services/quality/quality-scoring.service';
 
 describe('/api/data-quality/score', () => {
   beforeEach(() => {
@@ -11,6 +14,8 @@ describe('/api/data-quality/score', () => {
 
   describe('GET', () => {
     it('should calculate quality score for a business', async () => {
+      const { GET } = await import('../route');
+      const { businessRepository } = await import('../../../../lib/repositories/business.repository');
       const mockBusiness = {
         bizesId: '1234567890',
         name: '테스트 사업장',

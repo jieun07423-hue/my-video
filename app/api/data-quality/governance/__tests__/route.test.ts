@@ -15,7 +15,7 @@ describe('/api/data-quality/governance', () => {
   });
 
   it('returns governance report when action=report', async () => {
-    const request = { url: 'http://localhost:3000/api/data-quality/governance?action=report' } as NextRequest;
+    const request = { url: 'http://localhost:3000/api/data-quality/governance?action=report&format=text' } as NextRequest;
     const response = await GET(request);
     const text = await response.text();
 

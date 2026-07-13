@@ -1,6 +1,6 @@
 import { dbLogger } from '@/lib/logger';
 import { evaluateCompleteness, CompletenessScore } from './data-completeness.service';
-import { detectDuplicates, DuplicateDetectionResult } from './duplicate-detection.service';
+import { detectDuplicates, DuplicateDetectionResult } from '../duplicate-detection.service';
 import { performQualityCheck, MonitoringResult } from './data-quality-monitor.service';
 
 export interface QualityApiKey {

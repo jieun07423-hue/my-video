@@ -11,7 +11,7 @@ import {
   getSLAStats,
   setSLAConfig,
   getSLAConfig,
-} from '@/lib/services/quality-sla.service';
+} from '@/lib/services/quality/quality-sla.service';
 
 describe('/api/data-quality/sla', () => {
   beforeEach(() => {

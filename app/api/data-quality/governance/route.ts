@@ -6,7 +6,7 @@ import {
   getPolicy,
   initializeDefaultPolicies,
   generateGovernanceReport,
-} from '@/lib/services/quality-governance.service';
+} from '@/lib/services/quality/quality-governance.service';
 import { apiLogger } from '@/lib/logger';
 import { createApiErrorResponse } from '@/lib/api/handlers';
 

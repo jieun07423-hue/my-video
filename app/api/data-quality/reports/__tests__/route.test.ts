@@ -4,7 +4,7 @@ import {
   getReportHistory,
   getReportConfig,
   setReportConfig,
-} from '@/lib/services/quality-automated-reporting.service';
+} from '@/lib/services/quality/quality-automated-reporting.service';
 
 describe('/api/data-quality/reports', () => {
   describe('GET', () => {

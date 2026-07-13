@@ -1,6 +1,6 @@
 import { dbLogger } from '@/lib/logger';
 import { evaluateCompleteness, evaluateBatchCompleteness } from './data-completeness.service';
-import { detectDuplicates } from './duplicate-detection.service';
+import { detectDuplicates } from '../duplicate-detection.service';
 
 export interface QualityThreshold {
   id: string;

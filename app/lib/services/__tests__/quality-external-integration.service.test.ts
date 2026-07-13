@@ -10,7 +10,7 @@ import {
   getIntegrationHistory,
   getIntegrationStats,
   generateIntegrationReport,
-} from '../quality-external-integration.service';
+} from '../quality/quality-external-integration.service';
 
 describe('QualityExternalIntegrationService', () => {
   beforeEach(() => {

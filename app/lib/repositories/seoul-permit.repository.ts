@@ -1,5 +1,5 @@
 import db from '@/lib/db';
-import { syncLogger } from '@/lib/logger';
+import { syncLogger, dbLogger } from '@/lib/logger';
 
 export interface CreateSeoulPermitInput {
   manageNo: string;

@@ -1,13 +1,9 @@
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { NextRequest } from 'next/server';
-import { GET, POST } from '../route';
-
-jest.mock('@/lib/services/duplicate-detection.service', () => ({
+jest.mock('../../../../lib/services/duplicate-detection.service', () => ({
   detectDuplicates: jest.fn(),
   mergeBusinessData: jest.fn(),
 }));
 
-jest.mock('@/lib/repositories/business.repository', () => ({
+jest.mock('../../../../lib/repositories/business.repository', () => ({
   businessRepository: {
     search: jest.fn(),
     findByBizesId: jest.fn(),
@@ -15,12 +11,15 @@ jest.mock('@/lib/repositories/business.repository', () => ({
   },
 }));
 
-jest.mock('@/lib/logger', () => ({
+jest.mock('../../../../lib/logger', () => ({
   apiLogger: {
     info: jest.fn(),
     error: jest.fn(),
   },
 }));
+
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { NextRequest } from 'next/server';
 
 describe('/api/data-quality/duplicates', () => {
   beforeEach(() => {
@@ -29,8 +28,9 @@ describe('/api/data-quality/duplicates', () => {
 
   describe('GET', () => {
     it('중복 탐지 결과를 반환해야 한다', async () => {
-      const { detectDuplicates } = await import('@/lib/services/duplicate-detection.service');
-      const { businessRepository } = await import('@/lib/repositories/business.repository');
+      const { GET } = await import('../route');
+      const { detectDuplicates } = await import('../../../../lib/services/duplicate-detection.service');
+      const { businessRepository } = await import('../../../../lib/repositories/business.repository');
 
       jest.mocked(businessRepository.search).mockResolvedValue({
         items: [
@@ -67,6 +67,7 @@ describe('/api/data-quality/duplicates', () => {
 
   describe('POST', () => {
     it('primaryId가 없으면 400 에러를 반환해야 한다', async () => {
+      const { POST } = await import('../route');
       const request = {
         json: jest.fn().mockResolvedValue({ duplicateId: '2' }),
       } as unknown as NextRequest;
@@ -79,6 +80,7 @@ describe('/api/data-quality/duplicates', () => {
     });
 
     it('duplicateId가 없으면 400 에러를 반환해야 한다', async () => {
+      const { POST } = await import('../route');
       const request = {
         json: jest.fn().mockResolvedValue({ primaryId: '1' }),
       } as unknown as NextRequest;
@@ -91,7 +93,8 @@ describe('/api/data-quality/duplicates', () => {
     });
 
     it('존재하지 않는 사업체면 404 에러를 반환해야 한다', async () => {
-      const { businessRepository } = await import('@/lib/repositories/business.repository');
+      const { POST } = await import('../route');
+      const { businessRepository } = await import('../../../../lib/repositories/business.repository');
       jest.mocked(businessRepository.findByBizesId).mockResolvedValue(null);
 
       const request = {
@@ -106,8 +109,9 @@ describe('/api/data-quality/duplicates', () => {
     });
 
     it('병합 성공 시 결과를 반환해야 한다', async () => {
-      const { mergeBusinessData } = await import('@/lib/services/duplicate-detection.service');
-      const { businessRepository } = await import('@/lib/repositories/business.repository');
+      const { POST } = await import('../route');
+      const { mergeBusinessData } = await import('../../../../lib/services/duplicate-detection.service');
+      const { businessRepository } = await import('../../../../lib/repositories/business.repository');
 
       jest.mocked(businessRepository.findByBizesId)
         .mockResolvedValueOnce({ id: '1', bizesId: '1', name: '메인' })

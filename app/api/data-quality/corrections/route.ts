@@ -4,7 +4,7 @@ import {
   applyCorrections,
   getCorrectionHistory,
   generateCorrectionReport,
-} from '@/lib/services/data-correction.service';
+} from '@/lib/services/quality/data-correction.service';
 import { businessRepository } from '@/lib/repositories/business.repository';
 import { apiLogger } from '@/lib/logger';
 import { createApiErrorResponse } from '@/lib/api/handlers';
@@ -101,7 +101,12 @@ export async function POST(request: NextRequest) {
         dryRun: false,
       });
 
-      return NextResponse.json(result);
+      return NextResponse.json({
+        ...result,
+        applied: result.appliedCorrections,
+        skipped: result.totalSuggestions - result.appliedCorrections,
+        failed: 0,
+      });
     }
 
     return NextResponse.json({ error: '잘못된 요청입니다' }, { status: 400 });

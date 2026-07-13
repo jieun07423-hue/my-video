@@ -12,7 +12,7 @@ import {
   getDefaultPolicies,
   initializeDefaultPolicies,
   generateGovernanceReport,
-} from '../quality-governance.service';
+} from '../quality/quality-governance.service';
 
 describe('QualityGovernanceService', () => {
   beforeEach(() => {
@@ -140,8 +140,9 @@ describe('QualityGovernanceService', () => {
       logAudit('test_action', 'test_target', { detail: 'test' });
       const logs = getAuditLogs();
       expect(logs.length).toBeGreaterThan(0);
-      expect(logs[logs.length - 1].action).toBe('test_action');
-      expect(logs[logs.length - 1].target).toBe('test_target');
+      const testLog = logs.find(log => log.action === 'test_action');
+      expect(testLog).toBeDefined();
+      expect(testLog?.target).toBe('test_target');
     });
   });
 });

@@ -13,7 +13,7 @@ import {
   generateCostReport,
   getCostStats,
   generateCostReportText,
-} from '../quality-cost-analysis.service';
+} from '../quality/quality-cost-analysis.service';
 
 describe('QualityCostAnalysisService', () => {
   beforeEach(() => {

@@ -7,7 +7,7 @@ import {
   cancelBatchJob,
   getBatchStats,
   clearCompletedJobs,
-} from '@/lib/services/quality-batch.service';
+} from '@/lib/services/quality/quality-batch.service';
 import { businessRepository } from '@/lib/repositories/business.repository';
 import { apiLogger } from '@/lib/logger';
 import { createApiErrorResponse } from '@/lib/api/handlers';

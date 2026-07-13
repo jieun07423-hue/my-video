@@ -13,7 +13,7 @@ import {
   generateCostReport,
   getCostStats,
   generateCostReportText,
-} from '@/lib/services/quality-cost-analysis.service';
+} from '@/lib/services/quality/quality-cost-analysis.service';
 import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: Request) {

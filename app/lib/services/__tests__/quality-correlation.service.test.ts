@@ -11,7 +11,7 @@ import {
   getCorrelationHistory,
   getCorrelationStats,
   generateCorrelationReport,
-} from '../quality-correlation.service';
+} from '../quality/quality-correlation.service';
 
 describe('QualityCorrelationService', () => {
   beforeEach(() => {

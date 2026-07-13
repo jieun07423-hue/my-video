@@ -6,7 +6,7 @@ import {
   executeWorkflow,
   getExecutionHistory,
   getRemediationStats,
-} from '../quality-auto-remediation.service';
+} from '../quality/quality-auto-remediation.service';
 
 describe('QualityAutoRemediationService', () => {
   describe('workflow management', () => {

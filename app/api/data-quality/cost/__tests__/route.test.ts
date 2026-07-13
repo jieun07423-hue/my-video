@@ -12,7 +12,7 @@ import {
   getCostEntries,
   generateCostReport,
   getCostStats,
-} from '@/lib/services/quality-cost-analysis.service';
+} from '@/lib/services/quality/quality-cost-analysis.service';
 
 describe('/api/data-quality/cost', () => {
   beforeEach(() => {

@@ -6,7 +6,7 @@ import {
   revokeApiKey,
   getRequestStats,
   generateApiKeyDocumentation,
-} from '@/lib/services/quality-api-gateway.service';
+} from '@/lib/services/quality/quality-api-gateway.service';
 import { apiLogger } from '@/lib/logger';
 import { createApiErrorResponse } from '@/lib/api/handlers';
 

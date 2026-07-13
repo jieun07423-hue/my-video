@@ -13,6 +13,7 @@ export default auth((req) => {
     '/api/dashboard/stats',
     '/api/sync',
     '/api/webhook',
+    '/api/admin/claims',
   ]
 
   // API 라우트는 별도의 인증 미들웨어에서 처리

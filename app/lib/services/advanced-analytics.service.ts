@@ -1,6 +1,6 @@
 import { dbLogger } from '@/lib/logger';
-import { QualityMetrics } from './data-quality-monitor.service';
-import { TrendAnalysis } from './quality-trend.service';
+import { QualityMetrics } from './quality/data-quality-monitor.service';
+import { TrendAnalysis } from './quality/quality-trend.service';
 
 export interface ExecutiveReport {
   id: string;
@@ -131,6 +131,7 @@ export function generateExecutiveReport(
     sections,
     recommendations,
     score,
+    grade: summary.grade,
   };
 }
 

@@ -1,6 +1,6 @@
 import { dbLogger } from '@/lib/logger';
-import { calculateQualityScore, getScoreHistory } from './quality-scoring.service';
-import { getCheckHistory, getCheckStats } from './realtime-quality-check.service';
+import { calculateQualityScore, getScoreHistory, getScoreStats } from './quality-scoring.service';
+import { getCheckHistory, getCheckStats } from '../realtime-quality-check.service';
 import { getValidationStats } from './quality-rules-engine.service';
 
 export interface ReportConfig {
@@ -58,7 +58,7 @@ export function getReportConfig(): ReportConfig {
 export function generateQualityReport(
   periodStart?: Date,
   periodEnd?: Date,
-  generatedBy: 'system' | 'user' = 'system'
+  generatedBy: 'system' | 'user' = 'user'
 ): QualityReport {
   const now = new Date();
   const start = periodStart || new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -85,7 +85,7 @@ export function generateQualityReport(
     title: '요약',
     content: `
       기간: ${start.toLocaleDateString('ko-KR')} ~ ${end.toLocaleDateString('ko-KR')}
-      전체 사업체: ${validationStats.totalRecords}개
+      전체 사업체: ${validationStats.totalRecords ?? validationStats.totalValidations ?? 0}개
       검증 완료: ${checkStats.totalChecks}회
       평균 점수: ${scoreStats.averageScore}점
     `,
@@ -96,11 +96,11 @@ export function generateQualityReport(
     },
   });
 
-  const failedRules = validationStats.failedRules;
+  const failedRules = validationStats.failedRules ?? validationStats.topFailingRules ?? [];
   if (failedRules.length > 0) {
     sections.push({
       title: '실패한 검증 규칙',
-      content: failedRules.map((r: any) => `${r.ruleName}: ${r.count}회 실패`).join('\n'),
+      content: failedRules.map((r: any) => `${r.ruleName}: ${r.count ?? r.failureCount ?? 0}회 실패`).join('\n'),
       data: failedRules,
     });
   }

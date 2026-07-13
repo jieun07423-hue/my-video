@@ -303,11 +303,11 @@ export function evaluateCompleteness(business: Record<string, any>): Completenes
 
   return {
     bizesId: business.bizesId || '',
-    totalScore: adjustedScore,
+    totalScore: totalScore,
     fieldScores,
     missingFields,
     completedFields,
-    grade: scoreToGrade(adjustedScore),
+    grade: scoreToGrade(totalScore),
     evaluatedAt: new Date(),
     crossValidation,
     freshness,
@@ -537,6 +537,7 @@ export function evaluateBatchCompleteness(
 }
 
 export function getRequiredFieldsForGrade(grade: 'A' | 'B' | 'C' | 'D' | 'F'): string[] {
+  if (grade === 'F') return [];
   const minScoreMap = { A: 90, B: 75, C: 60, D: 40, F: 0 };
   const minScore = minScoreMap[grade];
 

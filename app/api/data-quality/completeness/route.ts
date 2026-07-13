@@ -4,7 +4,7 @@ import {
   evaluateBatchCompleteness,
   getFieldDefinitions,
   getIndustryBenchmarks,
-} from '@/lib/services/data-completeness.service';
+} from '@/lib/services/quality/data-completeness.service';
 import { businessRepository } from '@/lib/repositories/business.repository';
 import { apiLogger } from '@/lib/logger';
 import { createApiErrorResponse } from '@/lib/api/handlers';

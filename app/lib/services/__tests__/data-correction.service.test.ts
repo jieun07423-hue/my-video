@@ -4,7 +4,7 @@ import {
   applyCorrections,
   getCorrectionHistory,
   generateCorrectionReport,
-} from '../data-correction.service';
+} from '../quality/data-correction.service';
 
 describe('DataCorrectionService', () => {
   const mockBusinesses = [
@@ -34,7 +34,7 @@ describe('DataCorrectionService', () => {
       longitude: 127.0074,
       businessCode: 'G47121',
       businessName: '다른 업종',
-      indsLclsNm: '도매零售',
+      indsLclsNm: '도매소매',
       indsMclsNm: '종합소매',
       indsSclsNm: '백화점',
       status: 'active',

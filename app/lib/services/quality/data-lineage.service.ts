@@ -278,6 +278,9 @@ export function generateLineageReport(
   if (businessId) {
     const summary = getLineageSummary(businessId);
     lines.push(`## 사업체: ${businessId}`);
+    if (startDate && endDate) {
+      lines.push(`- 기간: ${startDate.toLocaleDateString('ko-KR')} ~ ${endDate.toLocaleDateString('ko-KR')}`);
+    }
     lines.push(`- 총 변경 횟수: ${summary.totalChanges}`);
     lines.push(`- 마지막 수정: ${summary.lastModified.toLocaleString('ko-KR')}`);
     lines.push(`- 변경 빈도: ${summary.changeFrequency}회/일`);

@@ -6,7 +6,7 @@ import {
   getRequiredFieldsForGrade,
   getFieldDefinitions,
   getIndustryBenchmarks,
-} from '../data-completeness.service';
+} from '../quality/data-completeness.service';
 
 describe('data-completeness.service', () => {
   describe('scoreToGrade', () => {

@@ -6,7 +6,7 @@ import {
   getAnalysisStats,
   setAIAnalysisConfig,
   getAIAnalysisConfig,
-} from '@/lib/services/quality-ai-analysis.service';
+} from '@/lib/services/quality/quality-ai-analysis.service';
 
 describe('/api/data-quality/ai-analysis', () => {
   beforeEach(() => {

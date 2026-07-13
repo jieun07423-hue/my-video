@@ -6,7 +6,7 @@ import {
   getIntegrationStats,
   addExternalSystem,
   removeExternalSystem,
-} from '@/lib/services/quality-external-integration.service';
+} from '@/lib/services/quality/quality-external-integration.service';
 
 describe('/api/data-quality/integration', () => {
   beforeEach(() => {

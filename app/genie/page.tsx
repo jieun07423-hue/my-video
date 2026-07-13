@@ -567,7 +567,7 @@ export default function GeniePage() {
         <footer className="text-center mt-6 text-slate-500 text-sm">
           <p className="flex items-center justify-center gap-2">
             <Zap className="w-4 h-4 text-purple-400" />
-            Powered by AI •常に進化
+            Powered by AI • 항상 진화
           </p>
         </footer>
       </div>

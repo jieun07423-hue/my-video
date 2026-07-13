@@ -1,5 +1,5 @@
 import { Worker, Job } from 'bullmq';
-import redisConnection from '@/lib/redis';
+import { bullConnection } from '@/lib/redis';
 import { syncQueueName, SyncJobData } from '@/lib/queues/sync.queue';
 import { syncFromPublicDataPortal } from '@/lib/services/public-data-portal.service';
 import { syncStateRepository } from '@/lib/repositories/sync-state.repository';
@@ -51,7 +51,7 @@ export const syncWorker = new Worker(
     }
   },
   {
-    connection: redisConnection,
+    connection: bullConnection,
     concurrency: 1,
   }
 );

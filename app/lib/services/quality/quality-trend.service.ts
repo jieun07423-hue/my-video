@@ -194,13 +194,13 @@ function detectSeasonality(values: number[]): SeasonalityInfo {
   }
 
   const period = 7;
-  const周期Strength = calculateSeasonalStrength(values, period);
+  const seasonalStrength = calculateSeasonalStrength(values, period);
 
-  if (周期Strength > 0.3) {
+  if (seasonalStrength > 0.3) {
     return {
       detected: true,
       period,
-      strength: Math.round(周期Strength * 100) / 100,
+      strength: Math.round(seasonalStrength * 100) / 100,
     };
   }
 

@@ -12,7 +12,7 @@ import {
   initializeDefaultRuleSets,
   setRulesEngineConfig,
   getRulesEngineConfig,
-} from '../quality-rules-engine.service';
+} from '../quality/quality-rules-engine.service';
 
 describe('QualityRulesEngineService', () => {
   beforeEach(() => {

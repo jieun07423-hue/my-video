@@ -11,7 +11,7 @@ import {
   setRemediationConfig,
   getRemediationConfig,
   generateRemediationReport,
-} from '@/lib/services/quality-auto-remediation.service';
+} from '@/lib/services/quality/quality-auto-remediation.service';
 import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: Request) {

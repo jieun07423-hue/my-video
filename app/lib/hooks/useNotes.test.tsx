@@ -2,10 +2,10 @@ import { describe, it, expect, beforeEach } from '@jest/globals'
 import React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, waitFor, act } from '@testing-library/react'
-import { noteRepository } from '../repositories/note.repository'
+import { noteRepository } from '@/lib/repositories/note.repository'
 import { useDeletedNotes, useRestoreNote, usePermanentDeleteNote } from './useNotes'
 
-jest.mock('../repositories/note.repository', () => ({
+jest.mock('@/lib/repositories/note.repository', () => ({
   noteRepository: {
     findDeleted: jest.fn(),
     restore: jest.fn(),
@@ -105,11 +105,11 @@ describe('useRestoreNote', () => {
     const { result } = renderHook(() => useRestoreNote(), { wrapper })
 
     await act(async () => {
-      await result.current.mutateAsync('note-1')
+      await result.current.mutate('note-1')
     })
 
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
     expect(noteRepository.restore).toHaveBeenCalledWith('note-1')
-    expect(result.current.isSuccess).toBe(true)
   })
 
   it('복원 실패 시 에러를 처리해야 한다', async () => {
@@ -119,12 +119,12 @@ describe('useRestoreNote', () => {
 
     await act(async () => {
       try {
-        await result.current.mutateAsync('note-1')
+        await result.current.mutate('note-1')
       } catch (e) {}
     })
 
+    await waitFor(() => expect(result.current.isError).toBe(true))
     expect(noteRepository.restore).toHaveBeenCalledWith('note-1')
-    expect(result.current.isError).toBe(true)
   })
 })
 
@@ -152,11 +152,11 @@ describe('usePermanentDeleteNote', () => {
     const { result } = renderHook(() => usePermanentDeleteNote(), { wrapper })
 
     await act(async () => {
-      await result.current.mutateAsync('note-1')
+      await result.current.mutate('note-1')
     })
 
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
     expect(noteRepository.permanentDelete).toHaveBeenCalledWith('note-1')
-    expect(result.current.isSuccess).toBe(true)
   })
 
   it('영구 삭제 실패 시 에러를 처리해야 한다', async () => {
@@ -166,11 +166,11 @@ describe('usePermanentDeleteNote', () => {
 
     await act(async () => {
       try {
-        await result.current.mutateAsync('note-1')
+        await result.current.mutate('note-1')
       } catch (e) {}
     })
 
+    await waitFor(() => expect(result.current.isError).toBe(true))
     expect(noteRepository.permanentDelete).toHaveBeenCalledWith('note-1')
-    expect(result.current.isError).toBe(true)
   })
 })

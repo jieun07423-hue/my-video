@@ -7,7 +7,7 @@ import {
   formatReportAsMarkdown,
   setReportConfig,
   getReportConfig,
-} from '@/lib/services/quality-automated-reporting.service';
+} from '@/lib/services/quality/quality-automated-reporting.service';
 import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: Request) {

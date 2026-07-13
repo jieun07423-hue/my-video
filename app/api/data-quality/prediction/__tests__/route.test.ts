@@ -6,7 +6,7 @@ import {
   getPredictionStats,
   setPredictionConfig,
   getPredictionConfig,
-} from '@/lib/services/quality-prediction.service';
+} from '@/lib/services/quality/quality-prediction.service';
 
 describe('/api/data-quality/prediction', () => {
   beforeEach(() => {

@@ -10,7 +10,7 @@ import {
   getNotificationHistory,
   getNotificationStats,
   generateNotificationReport,
-} from '@/lib/services/quality-enhanced-notification.service';
+} from '@/lib/services/quality/quality-enhanced-notification.service';
 import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: Request) {

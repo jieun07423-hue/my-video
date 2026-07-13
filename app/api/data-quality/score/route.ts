@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { businessRepository } from '@/lib/repositories/business.repository';
-import { calculateQualityScore, getScoreHistory, getScoreStats, generateScoreReport, setScoringConfig, getScoringConfig } from '@/lib/services/quality-scoring.service';
+import { calculateQualityScore, getScoreHistory, getScoreStats, generateScoreReport, setScoringConfig, getScoringConfig } from '@/lib/services/quality/quality-scoring.service';
 import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: Request) {

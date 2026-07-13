@@ -2,86 +2,105 @@
  * 캐싱 레이어
  * Redis와 메모리 캐시를 통합한 추상화된 캐시 인터페이스
  */
+import { webLogger } from '@/lib/logger';
+
+// ---------------------------------------------------------------------------
+// Cache adapter interface (메모리/Redis 공통)
+// ---------------------------------------------------------------------------
+interface CacheAdapter {
+  get(key: string): Promise<string | null>;
+  set(key: string, value: string, ttl: number): Promise<boolean>;
+  del(key: string): Promise<boolean>;
+  keys(pattern: string): Promise<string[]>;
+  exists(key: string): Promise<number>;
+  ping(): Promise<string>;
+  quit(): Promise<string>;
+}
+
+interface CacheEntry {
+  value: string;
+  expireAt: number | null;
+}
+
+interface CacheInfo {
+  type: string;
+  keys: number;
+}
+
+interface CacheConfig {
+  host: string;
+  port: number;
+  password?: string;
+  db: number;
+  keyPrefix: string;
+  defaultTTL: number;
+}
 
 // 메모리 캐시 구현 (ioredis 없는 Fallback)
-class MemoryCache {
-  constructor() {
-    this.cache = new Map();
-  }
+class MemoryCacheAdapter implements CacheAdapter {
+  private cache = new Map<string, CacheEntry>();
 
-  async get(key) {
+  async get(key: string): Promise<string | null> {
     const item = this.cache.get(key);
     if (!item) return null;
-    
-    // TTL 체크
+
     if (item.expireAt && Date.now() > item.expireAt) {
       this.cache.delete(key);
       return null;
     }
-    
+
     return item.value;
   }
 
-  async set(key, value, ttl = 3600) {
-    const expireAt = ttl ? Date.now() + (ttl * 1000) : null;
+  async set(key: string, value: string, ttl: number): Promise<boolean> {
+    const expireAt = ttl > 0 ? Date.now() + ttl * 1000 : null;
     this.cache.set(key, { value, expireAt });
     return true;
   }
 
-  async del(key) {
+  async del(key: string): Promise<boolean> {
     return this.cache.delete(key);
   }
 
-  async keys(pattern) {
+  async keys(pattern: string): Promise<string[]> {
     const regex = new RegExp(pattern.replace(/\*/g, '.*'));
-    return Array.from(this.cache.keys()).filter(key => regex.test(key));
+    return Array.from(this.cache.keys()).filter((k) => regex.test(k));
   }
 
-  async del(...keys) {
-    keys.forEach(key => this.cache.delete(key));
-    return true;
-  }
-
-  async exists(key) {
+  async exists(key: string): Promise<number> {
     const item = this.cache.get(key);
     if (!item) return 0;
-    
-    // TTL 체크
+
     if (item.expireAt && Date.now() > item.expireAt) {
       this.cache.delete(key);
       return 0;
     }
-    
+
     return 1;
   }
 
-  async ping() {
+  async ping(): Promise<string> {
     return 'PONG';
   }
 
-  async info() {
-    return {
-      type: 'memory',
-      keys: this.cache.size
-    };
+  async info(): Promise<CacheInfo> {
+    return { type: 'memory', keys: this.cache.size };
   }
 
-  async quit() {
+  async quit(): Promise<string> {
     this.cache.clear();
     return 'OK';
   }
 }
 
-// Redis 캐시 구현 (ioredis 사용 가능 시)
-let RedisCache;
-try {
-  RedisCache = require('ioredis');
-} catch (error) {
-  // ioredis 없이면 MemoryCache 사용
-  RedisCache = MemoryCache;
-}
+// ---------------------------------------------------------------------------
+// CacheManager — 단일 진입점
+// ---------------------------------------------------------------------------
+export class CacheManager {
+  private config: CacheConfig;
+  private adapter: CacheAdapter | null = null;
+  private connected = false;
 
-class CacheManager {
   constructor() {
     this.config = {
       host: process.env.REDIS_HOST || 'localhost',
@@ -89,270 +108,246 @@ class CacheManager {
       password: process.env.REDIS_PASSWORD,
       db: parseInt(process.env.REDIS_DB || '0'),
       keyPrefix: process.env.REDIS_KEY_PREFIX || 'sbt:',
-      defaultTTL: parseInt(process.env.REDIS_DEFAULT_TTL || '3600'), // 1시간
-      retryDelayOnFailover: parseInt(process.env.REDIS_RETRY_DELAY || '100'),
-      maxRetriesPerRequest: parseInt(process.env.REDIS_MAX_RETRIES || '3'),
-      lazyConnect: true
+      defaultTTL: parseInt(process.env.REDIS_DEFAULT_TTL || '3600'),
     };
-    
-    this.client = null;
-    this.isConnected = false;
   }
 
-  async connect() {
+  async connect(): Promise<void> {
+    if (this.connected) return;
+
     try {
-      if (this.isConnected) return;
-      
-      // Redis가 있는지 확인
-      if (RedisCache === MemoryCache) {
-        console.log('🧠 메모리 캐시 모드로 시작');
-        this.client = new MemoryCache();
-        this.isConnected = true;
-        return;
+      const Redis = await importRedis();
+      if (Redis) {
+        webLogger.info('Redis 연결 시도 중...');
+        const client = new Redis({
+          host: this.config.host,
+          port: this.config.port,
+          password: this.config.password,
+          db: this.config.db,
+          lazyConnect: true,
+          maxRetriesPerRequest: 3,
+        });
+
+        client.on('connect', () => {
+          webLogger.info({ host: this.config.host, port: this.config.port }, 'Redis 연결 성공');
+          this.connected = true;
+        });
+        client.on('error', (error: Error) => {
+          webLogger.error({ error: error.message }, 'Redis 연결 오류');
+          this.connected = false;
+        });
+        client.on('close', () => {
+          webLogger.warn('Redis 연결 종료');
+          this.connected = false;
+        });
+
+        await client.ping();
+        this.adapter = createRedisAdapter(client);
+        webLogger.info({ host: this.config.host, port: this.config.port }, 'Redis 연결 정보');
+      } else {
+        webLogger.info('메모리 캐시 모드로 시작');
+        this.adapter = new MemoryCacheAdapter();
       }
-      
-      console.log('🔄 Redis 연결 시도 중...');
-      
-      this.client = new RedisCache(this.config);
-      
-      this.client.on('connect', () => {
-        console.log('✅ Redis 연결 성공');
-        this.isConnected = true;
-      });
-      
-      this.client.on('error', (error) => {
-        console.error('❌ Redis 연결 오류:', error.message);
-        this.isConnected = false;
-      });
-      
-      this.client.on('close', () => {
-        console.log('🔌 Redis 연결 종료');
-        this.isConnected = false;
-      });
-
-      // 연결 테스트
-      await this.client.ping();
-      console.log(`📍 Redis 연결 정보: ${this.config.host}:${this.config.port}`);
-      
+      this.connected = true;
     } catch (error) {
-      console.error('❌ 캐시 연결 실패:', error.message);
-      
-      // Fallback: 메모리 캐시로 전환
-      console.log('⚠️ 메모리 캐시 모드로 전환');
-      this.client = new MemoryCache();
-      this.isConnected = true;
+      webLogger.error({ error: (error as Error).message }, '캐시 연결 실패, 메모리 캐시로 전환');
+      this.adapter = new MemoryCacheAdapter();
+      this.connected = true;
     }
   }
 
-  async disconnect() {
-    if (this.client && this.isConnected) {
-      await this.client.quit();
-      this.isConnected = false;
-      console.log('🔌 캐시 연결 종료');
+  async disconnect(): Promise<void> {
+    if (this.adapter && this.connected) {
+      await this.adapter.quit();
+      this.connected = false;
+      webLogger.info('캐시 연결 종료');
     }
   }
 
-  async get(key) {
-    if (!this.isConnected) return null;
-    
+  private fullKey(key: string): string {
+    return `${this.config.keyPrefix}${key}`;
+  }
+
+  async get<T = unknown>(key: string): Promise<T | null> {
+    if (!this.adapter) return null;
     try {
-      const fullKey = `${this.config.keyPrefix}${key}`;
-      const value = await this.client.get(fullKey);
-      return value ? JSON.parse(value) : null;
+      const raw = await this.adapter.get(this.fullKey(key));
+      return raw ? (JSON.parse(raw) as T) : null;
     } catch (error) {
-      console.error(`캐시 조회 실패 (${key}):`, error.message);
+      webLogger.error({ error: (error as Error).message, key }, '캐시 조회 실패');
       return null;
     }
   }
 
-  async set(key, value, ttl) {
-    if (!this.isConnected) return false;
-    
+  async set(key: string, value: unknown, ttl?: number): Promise<boolean> {
+    if (!this.adapter) return false;
     try {
-      const fullKey = `${this.config.keyPrefix}${key}`;
-      const serializedValue = JSON.stringify(value);
-      const finalTTL = ttl || this.config.defaultTTL;
-      
-      if (RedisCache === MemoryCache) {
-        await this.client.set(key, serializedValue, finalTTL);
-      } else {
-        await this.client.setex(fullKey, finalTTL, serializedValue);
-      }
-      
-      return true;
+      const serialized = JSON.stringify(value);
+      return await this.adapter.set(this.fullKey(key), serialized, ttl ?? this.config.defaultTTL);
     } catch (error) {
-      console.error(`캐시 저장 실패 (${key}):`, error.message);
+      webLogger.error({ error: (error as Error).message, key }, '캐시 저장 실패');
       return false;
     }
   }
 
-  async del(key) {
-    if (!this.isConnected) return false;
-    
+  async del(key: string): Promise<boolean> {
+    if (!this.adapter) return false;
     try {
-      const fullKey = `${this.config.keyPrefix}${key}`;
-      
-      if (RedisCache === MemoryCache) {
-        await this.client.del(key);
-      } else {
-        await this.client.del(fullKey);
-      }
-      
-      return true;
+      return await this.adapter.del(this.fullKey(key));
     } catch (error) {
-      console.error(`캐시 삭제 실패 (${key}):`, error.message);
+      webLogger.error({ error: (error as Error).message, key }, '캐시 삭제 실패');
       return false;
     }
   }
 
-  async invalidatePattern(pattern) {
-    if (!this.isConnected) return false;
-    
+  async exists(key: string): Promise<boolean> {
+    if (!this.adapter) return false;
     try {
-      const fullPattern = `${this.config.keyPrefix}${pattern}`;
-      let keys;
-      
-      if (RedisCache === MemoryCache) {
-        keys = await this.client.keys(pattern);
-      } else {
-        keys = await this.client.keys(fullPattern);
-      }
-      
-      if (keys.length > 0) {
-        if (RedisCache === MemoryCache) {
-          await this.client.del(...keys);
-        } else {
-          await this.client.del(...keys.map(k => `${this.config.keyPrefix}${k}`));
-        }
-        
-        console.log(`🗑 캐시 패턴 삭제: ${pattern} (${keys.length}개)`);
-      }
-      
-      return true;
-    } catch (error) {
-      console.error(`캐시 패턴 삭제 실패 (${pattern}):`, error.message);
-      return false;
-    }
-  }
-
-  async exists(key) {
-    if (!this.isConnected) return false;
-    
-    try {
-      const fullKey = `${this.config.keyPrefix}${key}`;
-      const result = await this.client.exists(fullKey);
+      const result = await this.adapter.exists(this.fullKey(key));
       return result === 1;
     } catch (error) {
-      console.error(`캐시 존재 확인 실패 (${key}):`, error.message);
+      webLogger.error({ error: (error as Error).message, key }, '캐시 존재 확인 실패');
+      return false;
+    }
+  }
+
+  async invalidatePattern(pattern: string): Promise<boolean> {
+    if (!this.adapter) return false;
+    try {
+      const keys = await this.adapter.keys(this.fullKey(pattern));
+      if (keys.length > 0) {
+        await Promise.all(keys.map((k) => this.adapter!.del(k)));
+        webLogger.info({ pattern, count: keys.length }, '캐시 패턴 삭제 완료');
+      }
+      return true;
+    } catch (error) {
+      webLogger.error({ error: (error as Error).message, pattern }, '캐시 패턴 삭제 실패');
       return false;
     }
   }
 
   async getStats() {
-    if (!this.isConnected) return null;
-    
+    if (!this.adapter) return null;
     try {
-      const info = RedisCache === MemoryCache ? 
-        await this.client.info() : 
-        await this.client.info();
-      
-      const keyspace = RedisCache === MemoryCache ? 
-        await this.client.keys(`${this.config.keyPrefix}*`) :
-        await this.client.keys(`${this.config.keyPrefix}*`);
-      
+      const info = await this.adapter.info();
+      const keys = await this.adapter.keys(`${this.config.keyPrefix}*`);
       return {
-        connected: this.isConnected,
-        type: RedisCache === MemoryCache ? 'Memory' : 'Redis',
-        cachedKeys: keyspace.length,
-        redisInfo: info
+        connected: this.connected,
+        type: info.type,
+        cachedKeys: keys.length,
       };
     } catch (error) {
-      console.error('캐시 통계 조회 실패:', error.message);
+      webLogger.error({ error: (error as Error).message }, '캐시 통계 조회 실패');
       return null;
     }
   }
 
-  createRepositoryWrapper(repository) {
+  createRepositoryWrapper<T>(repository: T): CachedRepository<T> {
     return new CachedRepository(repository, this);
   }
 }
 
+// ---------------------------------------------------------------------------
+// Redis adapter (ioredis 래퍼)
+// ---------------------------------------------------------------------------
+interface IORedisClient {
+  get(key: string): Promise<string | null>;
+  setex(key: string, ttl: number, value: string): Promise<'OK'>;
+  del(...keys: string[]): Promise<number>;
+  keys(pattern: string): Promise<string[]>;
+  exists(...keys: string[]): Promise<number>;
+  ping(): Promise<string>;
+  info(): Promise<string>;
+  quit(): Promise<string>;
+  on(event: string, handler: (...args: unknown[]) => void): void;
+}
+
+function createRedisAdapter(client: IORedisClient): CacheAdapter {
+  return {
+    get: (key: string) => client.get(key),
+    set: async (key: string, value: string, ttl: number) => {
+      await client.setex(key, ttl, value);
+      return true;
+    },
+    del: async (key: string) => {
+      const count = await client.del(key);
+      return count > 0;
+    },
+    keys: (pattern: string) => client.keys(pattern),
+    exists: (key: string) => client.exists(key),
+    ping: () => client.ping(),
+    quit: () => client.quit(),
+  };
+}
+
+async function importRedis(): Promise<typeof import('ioredis') | null> {
+  try {
+    return await import('ioredis');
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Repository 캐싱 래퍼
-class CachedRepository {
-  constructor(repository, cacheManager) {
+// ---------------------------------------------------------------------------
+export class CachedRepository<T extends Record<string, unknown>> {
+  private repository: T;
+  private cache: CacheManager;
+  private prefixes = {
+    search: 'search:',
+    stats: 'stats:',
+    byId: 'byId:',
+    distinctCodes: 'distinct-codes:',
+  };
+
+  constructor(repository: T, cacheManager: CacheManager) {
     this.repository = repository;
     this.cache = cacheManager;
-    this.cacheKeys = {
-      search: 'search:',
-      stats: 'stats:',
-      byId: 'byId:',
-      distinctCodes: 'distinct-codes:'
-    };
   }
 
-  async search(options = {}) {
-    const cacheKey = `search:${JSON.stringify(options)}`;
-    
-    // 캐시 확인
-    let cached = await this.cache.get(cacheKey);
-    if (cached) {
-      console.log('🎯 캐시된 검색 결과 사용');
-      return cached;
-    }
+  async search(options: Record<string, unknown> = {}): Promise<unknown> {
+    const cacheKey = `${this.prefixes.search}${JSON.stringify(options)}`;
+    const cached = await this.cache.get(cacheKey);
+    if (cached) return cached;
 
-    // Repository 호출
-    const result = await this.repository.search(options);
-    
-    // 캐시 저장 (5분)
+    const result = await (this.repository as any).search(options);
     await this.cache.set(cacheKey, result, 300);
-    
     return result;
   }
 
-  async getStats() {
-    const cacheKey = this.cacheKeys.stats;
-    
-    // 캐시 확인
-    let cached = await this.cache.get(cacheKey);
-    if (cached) {
-      console.log('🎯 캐시된 통계 결과 사용');
-      return cached;
-    }
+  async getStats(): Promise<unknown> {
+    const cached = await this.cache.get(this.prefixes.stats);
+    if (cached) return cached;
 
-    // Repository 호출
-    const result = await this.repository.getStats();
-    
-    // 캐시 저장 (1분)
-    await this.cache.set(cacheKey, result, 60);
-    
+    const result = await (this.repository as any).getStats();
+    await this.cache.set(this.prefixes.stats, result, 60);
     return result;
   }
 
-  async getById(id) {
-    const cacheKey = `${this.cacheKeys.byId}${id}`;
-    
-    // 캐시 확인
-    let cached = await this.cache.get(cacheKey);
-    if (cached) {
-      console.log(`🎯 캐시된 상세 정보 사용 (${id})`);
-      return cached;
-    }
+  async getById(id: string): Promise<unknown> {
+    const cacheKey = `${this.prefixes.byId}${id}`;
+    const cached = await this.cache.get(cacheKey);
+    if (cached) return cached;
 
-    // Repository 호출
-    const result = await this.repository.getById(id);
-    
-    // 캐시 저장 (10분)
-    if (result) {
-      await this.cache.set(cacheKey, result, 600);
-    }
-    
+    const result = await (this.repository as any).getById(id);
+    if (result) await this.cache.set(cacheKey, result, 600);
     return result;
   }
 
-  async invalidate(pattern) {
-    console.log(`🗑 캐시 무효화: ${pattern}`);
-    return await this.cache.invalidatePattern(pattern);
+  async invalidate(pattern: string): Promise<boolean> {
+    return this.cache.invalidatePattern(pattern);
   }
+}
+
+// ---------------------------------------------------------------------------
+// 전역 싱글턴
+// ---------------------------------------------------------------------------
+export const globalCacheManager = new CacheManager();
+
+export async function initializeCache(): Promise<CacheManager> {
+  await globalCacheManager.connect();
+  return globalCacheManager;
 }
 
 // 전역 캐시 매니저 인스턴스

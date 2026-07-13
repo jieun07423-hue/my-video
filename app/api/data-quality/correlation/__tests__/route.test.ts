@@ -10,7 +10,7 @@ import {
   analyzeMultipleCorrelations,
   getCorrelationHistory,
   getCorrelationStats,
-} from '@/lib/services/quality-correlation.service';
+} from '@/lib/services/quality/quality-correlation.service';
 
 describe('/api/data-quality/correlation', () => {
   beforeEach(() => {

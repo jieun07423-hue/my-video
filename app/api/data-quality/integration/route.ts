@@ -10,7 +10,7 @@ import {
   getIntegrationHistory,
   getIntegrationStats,
   generateIntegrationReport,
-} from '@/lib/services/quality-external-integration.service';
+} from '@/lib/services/quality/quality-external-integration.service';
 import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: Request) {

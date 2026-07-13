@@ -7,7 +7,7 @@ import {
   getPredictionHistory,
   getPredictionStats,
   generatePredictionReport,
-} from '../quality-prediction.service';
+} from '../quality/quality-prediction.service';
 
 describe('QualityPredictionService', () => {
   beforeEach(() => {

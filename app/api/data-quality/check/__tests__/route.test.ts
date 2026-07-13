@@ -1,8 +1,11 @@
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { businessRepository } from '@/lib/repositories/business.repository';
-import { runQualityCheck, getCheckStats, setQualityCheckConfig } from '@/lib/services/realtime-quality-check.service';
+jest.mock('../../../../lib/repositories/business.repository', () => ({
+  businessRepository: {
+    findByBizesId: jest.fn(),
+  },
+}));
 
-jest.mock('@/lib/repositories/business.repository');
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { runQualityCheck, getCheckStats, setQualityCheckConfig } from '../../../../lib/services/realtime-quality-check.service';
 
 describe('/api/data-quality/check', () => {
   beforeEach(() => {
@@ -18,6 +21,8 @@ describe('/api/data-quality/check', () => {
 
   describe('GET', () => {
     it('should run quality check for a business', async () => {
+      const { GET } = await import('../route');
+      const { businessRepository } = await import('../../../../lib/repositories/business.repository');
       const mockBusiness = {
         bizesId: '1234567890',
         name: '테스트 사업장',
@@ -46,8 +51,7 @@ describe('/api/data-quality/check', () => {
 
   describe('POST', () => {
     it('should update config when action is config', async () => {
-      const newConfig = { timeout: 10000, blockingMode: true };
-      setQualityCheckConfig(newConfig);
+      setQualityCheckConfig({ timeout: 10000, blockingMode: true });
       expect(true).toBe(true);
     });
 

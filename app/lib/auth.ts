@@ -1,16 +1,22 @@
-import NextAuth, { DefaultSession } from 'next-auth'
+import NextAuth from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import db from './db'
+import db, { getPrismaClientInstance } from './db'
+import { adminRepository } from '@/app/lib/repositories/admin.repository'
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
+import type { DefaultSession } from '@auth/core/types'
 
-declare module 'next-auth' {
+/**
+ * NextAuth v5 — @auth/core 모듈 Augmentation.
+ * Session.user에 role 필드를 추가하여 커스텀 타입을 전파.
+ */
+declare module '@auth/core/types' {
   interface Session {
     user: {
       id: string
       email: string
       role: string
-    }
+    } & DefaultSession['user']
   }
 }
 
@@ -18,7 +24,7 @@ const credentialsProvider = Credentials({
   name: 'credentials',
   credentials: {
     email: { label: '이메일', type: 'email' },
-    password: { label: '비밀번호', type: 'password' }
+    password: { label: '비밀번호', type: 'password' },
   },
   async authorize(credentials) {
     if (!credentials?.email || !credentials?.password) {
@@ -26,9 +32,7 @@ const credentialsProvider = Credentials({
     }
 
     try {
-      const admin = await db.admin.findUnique({
-        where: { username: credentials.email as string }
-      })
+      const admin = await adminRepository.findByUsername(credentials.email as string)
 
       if (!admin || !admin.passwordHash) {
         return null
@@ -36,7 +40,7 @@ const credentialsProvider = Credentials({
 
       const passwordMatch = await bcrypt.compare(
         credentials.password as string,
-        admin.passwordHash
+        admin.passwordHash,
       )
 
       if (!passwordMatch) {
@@ -53,14 +57,16 @@ const credentialsProvider = Credentials({
       console.error('Auth error:', error)
       return null
     }
-  }
+  },
 })
 
+const USE_REAL_DB = !!process.env.DATABASE_URL
+const prismaClient = USE_REAL_DB ? getPrismaClientInstance() : null
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(db),
+  adapter: prismaClient ? PrismaAdapter(prismaClient) : undefined,
   providers: [
     credentialsProvider,
-    // 카카오톡 OAuth 제공자 (예시)
     {
       id: 'kakao',
       name: 'Kakao',
@@ -73,12 +79,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       token: 'https://kauth.kakao.com/oauth/token',
       userinfo: 'https://kapi.kakao.com/v2/user/me',
-      profile(profile) {
+      profile(profile: { id: { toString: () => string }; properties: { nickname?: string; profile_image?: string }; kakao_account?: { email?: string } }) {
         return {
           id: profile.id.toString(),
-          name: profile.properties.nickname || '',
+          name: profile.properties?.nickname || '',
           email: profile.kakao_account?.email || '',
-          image: profile.properties.profile_image || '',
+          image: profile.properties?.profile_image || '',
         }
       },
       clientId: process.env.KAKAO_CLIENT_ID!,
@@ -94,7 +100,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: any; user: any }) {
       if (user) {
         token.id = user.id
         token.email = user.email
@@ -102,7 +108,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: any; token: any }) {
       if (token) {
         session.user.id = token.id as string
         session.user.email = token.email as string

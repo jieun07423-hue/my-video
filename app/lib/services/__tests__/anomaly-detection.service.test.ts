@@ -67,7 +67,7 @@ describe('AnomalyDetectionService', () => {
       expect(result).toHaveProperty('anomaliesDetected');
       expect(result).toHaveProperty('anomalyRate');
       expect(result).toHaveProperty('anomalies');
-      expect(result).toHaveProperty('timestamp');
+      expect(result).toHaveProperty('detectedAt');
 
       expect(result.totalBusinesses).toBe(mockBusinesses.length);
       expect(result.anomaliesDetected).toBeGreaterThanOrEqual(0);

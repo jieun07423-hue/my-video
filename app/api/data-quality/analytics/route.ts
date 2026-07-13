@@ -5,8 +5,8 @@ import {
   compareWithBenchmarks,
   exportReport,
 } from '@/lib/services/advanced-analytics.service';
-import { collectMetrics } from '@/lib/services/data-quality-monitor.service';
-import { analyzeTrend } from '@/lib/services/quality-trend.service';
+import { collectMetrics } from '@/lib/services/quality/data-quality-monitor.service';
+import { analyzeTrend } from '@/lib/services/quality/quality-trend.service';
 import { businessRepository } from '@/lib/repositories/business.repository';
 import { apiLogger } from '@/lib/logger';
 import { createApiErrorResponse } from '@/lib/api/handlers';

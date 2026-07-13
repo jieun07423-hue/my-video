@@ -224,7 +224,7 @@ export async function fetchIndustryCategories(): Promise<Array<{ code: string; n
     { code: 'C', name: '제조업' },
     { code: 'D', name: '전기, 가스, 증기 및 공기조절 공급업' },
     { code: 'E', name: '하수, 폐기물 처리, 원료 재생업' },
-    { code: 'F', name: '建筑业' },
+    { code: 'F', name: '건축업' },
     { code: 'G', name: '도매 및 소매업' },
     { code: 'H', name: '운수 및 창고업' },
     { code: 'I', name: '숙박 및 음식점업' },
@@ -236,7 +236,7 @@ export async function fetchIndustryCategories(): Promise<Array<{ code: string; n
     { code: 'O', name: '공공 행정, Defence 및 사회 보장 행정' },
     { code: 'P', name: '교육 서비스업' },
     { code: 'Q', name: '보건업 및 사회복지 서비스업' },
-    { code: 'R', name: '예술, 스포츠 및 여가 관련服务业' },
+    { code: 'R', name: '예술, 스포츠 및 여가 관련 서비스업' },
     { code: 'S', name: '협회 및 기타 개인 서비스업' },
     { code: 'T', name: '가구 내 고용활동 및 달리 분류되지 않은 자가 소비 생산활동' },
   ];

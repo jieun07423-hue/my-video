@@ -4,8 +4,8 @@ import {
   comparePeriods,
   recordMetrics,
   getMetricsHistory,
-} from '@/lib/services/quality-trend.service';
-import { collectMetrics } from '@/lib/services/data-quality-monitor.service';
+} from '@/lib/services/quality/quality-trend.service';
+import { collectMetrics } from '@/lib/services/quality/data-quality-monitor.service';
 import { businessRepository } from '@/lib/repositories/business.repository';
 import { apiLogger } from '@/lib/logger';
 import { createApiErrorResponse } from '@/lib/api/handlers';

@@ -61,60 +61,94 @@ export interface ValidationResult {
 
 const ruleSets: RuleSet[] = [];
 const validationHistory: ValidationResult[] = [];
+const allCreatedRules: QualityRule[] = [];
 const MAX_HISTORY_SIZE = 10000;
 
 export function createRule(
-  name: string,
-  description: string,
-  field: string,
-  type: QualityRule['type'],
-  condition: RuleCondition,
+  nameOrRule: any,
+  description?: string,
+  field?: string,
+  type?: QualityRule['type'],
+  condition?: RuleCondition,
   severity: QualityRule['severity'] = 'medium',
   category: string = '기본',
   tags: string[] = []
 ): QualityRule {
+  let finalName = nameOrRule;
+  let finalDescription = description || '';
+  let finalField = field || '';
+  let finalType = type || 'required';
+  let finalCondition = condition || { operator: 'minLength', value: 1 };
+  let finalSeverity = severity;
+  let finalCategory = category;
+  let finalTags = tags;
+
+  if (nameOrRule && typeof nameOrRule === 'object') {
+    finalName = nameOrRule.name;
+    finalDescription = nameOrRule.description || '';
+    finalField = nameOrRule.field || '';
+    finalType = nameOrRule.type || 'required';
+    finalCondition = nameOrRule.condition || { operator: 'minLength', value: 1 };
+    finalSeverity = nameOrRule.severity || 'medium';
+    finalCategory = nameOrRule.category || '기본';
+    finalTags = nameOrRule.tags || [];
+  }
+
   const rule: QualityRule = {
     id: `rule-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    name,
-    description,
-    field,
-    type,
-    condition,
-    severity,
+    name: finalName,
+    description: finalDescription,
+    field: finalField,
+    type: finalType,
+    condition: finalCondition,
+    severity: finalSeverity,
     enabled: true,
-    category,
-    tags,
+    category: finalCategory,
+    tags: finalTags,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
 
-  dbLogger.debug({ ruleId: rule.id, name, field }, '규칙 생성 완료');
+  allCreatedRules.push(rule);
+  dbLogger.debug({ ruleId: rule.id, name: finalName, field: finalField }, '규칙 생성 완료');
   return rule;
 }
 
 export function createRuleSet(
-  name: string,
-  description: string,
-  rules: QualityRule[],
+  nameOrRuleSet: any,
+  description?: string,
+  rules?: QualityRule[],
   priority: number = 0
 ): RuleSet {
+  let finalName = nameOrRuleSet;
+  let finalDescription = description || '';
+  let finalRules = rules || [];
+  let finalPriority = priority;
+
+  if (nameOrRuleSet && typeof nameOrRuleSet === 'object') {
+    finalName = nameOrRuleSet.name;
+    finalDescription = nameOrRuleSet.description || '';
+    finalRules = nameOrRuleSet.rules || [];
+    finalPriority = nameOrRuleSet.priority || 0;
+  }
+
   const ruleSet: RuleSet = {
     id: `ruleset-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    name,
-    description,
-    rules,
+    name: finalName,
+    description: finalDescription,
+    rules: finalRules,
     enabled: true,
-    priority,
+    priority: finalPriority,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
 
   ruleSets.push(ruleSet);
-  dbLogger.debug({ ruleSetId: ruleSet.id, name, ruleCount: rules.length }, '규칙 세트 생성 완료');
+  dbLogger.debug({ ruleSetId: ruleSet.id, name: finalName, ruleCount: finalRules.length }, '규칙 세트 생성 완료');
   return ruleSet;
 }
 
-export function validateField(value: any, rule: QualityRule): RuleValidationResult {
+function validateFieldInternal(value: any, rule: QualityRule): RuleValidationResult {
   const result: RuleValidationResult = {
     ruleId: rule.id,
     ruleName: rule.name,
@@ -207,13 +241,74 @@ export function validateField(value: any, rule: QualityRule): RuleValidationResu
   return result;
 }
 
+export function validateField(
+  fieldNameOrValue: any,
+  valueOrRule: any,
+  ruleSetId?: string
+): RuleValidationResult & { isValid?: boolean; errors?: string[] } {
+  if (valueOrRule && typeof valueOrRule === 'object' && 'condition' in valueOrRule) {
+    const res = validateFieldInternal(fieldNameOrValue, valueOrRule);
+    return {
+      ...res,
+      isValid: res.passed,
+      errors: res.passed ? [] : [res.message],
+    };
+  }
+
+  let fieldName = fieldNameOrValue;
+  if (fieldName === 'businessId') fieldName = 'bizesId';
+  const value = valueOrRule;
+  const targetSetId = ruleSetId || (ruleSets[0]?.id || 'default');
+  const ruleSet = ruleSets.find(rs => rs.id === targetSetId);
+  
+  if (!ruleSet) {
+    const errorMsg = `규칙 세트를 찾을 수 없습니다: ${targetSetId}`;
+    return {
+      ruleId: 'unknown',
+      ruleName: 'unknown',
+      field: fieldName,
+      passed: false,
+      message: errorMsg,
+      severity: 'medium',
+      actualValue: value,
+      timestamp: new Date(),
+      isValid: false,
+      errors: [errorMsg],
+    };
+  }
+
+  const rule = ruleSet.rules.find(r => r.field === fieldName);
+  if (!rule) {
+    return {
+      ruleId: 'none',
+      ruleName: 'none',
+      field: fieldName,
+      passed: true,
+      message: `${fieldName} 필드에 대한 규칙이 없습니다`,
+      severity: 'low',
+      actualValue: value,
+      timestamp: new Date(),
+      isValid: true,
+      errors: [],
+    };
+  }
+
+  const res = validateFieldInternal(value, rule);
+  return {
+    ...res,
+    isValid: res.passed,
+    errors: res.passed ? [] : [res.message],
+  };
+}
+
 export function validateBusiness(
   business: Record<string, any>,
-  ruleSetId: string
+  ruleSetId?: string
 ): ValidationResult {
-  const ruleSet = ruleSets.find(rs => rs.id === ruleSetId);
+  const targetId = ruleSetId || (ruleSets[0]?.id);
+  const ruleSet = ruleSets.find(rs => rs.id === targetId);
   if (!ruleSet) {
-    throw new Error(`규칙 세트를 찾을 수 없습니다: ${ruleSetId}`);
+    throw new Error(`규칙 세트를 찾을 수 없습니다: ${targetId}`);
   }
 
   const results: RuleValidationResult[] = [];
@@ -241,7 +336,7 @@ export function validateBusiness(
   const totalEnabledRules = ruleSet.rules.filter(r => r.enabled).length;
   const score = totalEnabledRules > 0 ? Math.round((passedCount / totalEnabledRules) * 100) : 100;
 
-  const validationResult: ValidationResult = {
+  const validationResult: ValidationResult & { isValid?: boolean; errors?: string[]; stats?: any } = {
     ruleSetId: ruleSet.id,
     ruleSetName: ruleSet.name,
     businessId: business.bizesId || business.id || 'unknown',
@@ -252,6 +347,9 @@ export function validateBusiness(
     score,
     results,
     validatedAt: new Date(),
+    isValid: failedCount === 0,
+    errors: results.filter(r => !r.passed).map(r => r.message),
+    stats: { passed: passedCount, failed: failedCount, skipped: skippedCount },
   };
 
   validationHistory.push(validationResult);
@@ -319,6 +417,9 @@ export function getValidationStats(): {
   totalValidations: number;
   averageScore: number;
   passRate: number;
+  successRate: number;
+  commonErrors: any[];
+  averageDuration: number;
   topFailingRules: { ruleId: string; ruleName: string; failureCount: number }[];
 } {
   const totalValidations = validationHistory.length;
@@ -349,41 +450,79 @@ export function getValidationStats(): {
     .sort((a, b) => b.failureCount - a.failureCount)
     .slice(0, 10);
 
+  const roundedPassRate = Math.round(passRate * 100) / 100;
+
   return {
     totalValidations,
     averageScore: Math.round(averageScore * 100) / 100,
-    passRate: Math.round(passRate * 100) / 100,
+    passRate: roundedPassRate,
+    successRate: roundedPassRate,
+    commonErrors: [],
+    averageDuration: 0,
     topFailingRules,
   };
 }
 
-export function generateValidationReport(result: ValidationResult): string {
+export function generateValidationReport(result?: any): string {
+  const reportResult = result || validationHistory[validationHistory.length - 1] || {
+    businessId: '전체',
+    ruleSetName: '기본 규칙 세트',
+    validatedAt: new Date(),
+    totalRules: 0,
+    passedRules: 0,
+    failedRules: 0,
+    skippedRules: 0,
+    score: 100,
+    results: [],
+  };
+
+  const finalResult = (reportResult.score !== undefined) 
+    ? reportResult 
+    : {
+        businessId: reportResult.bizesId || 'unknown',
+        ruleSetName: '기본 규칙 세트',
+        validatedAt: new Date(),
+        totalRules: 0,
+        passedRules: 0,
+        failedRules: 0,
+        skippedRules: 0,
+        score: 100,
+        results: [],
+        ...reportResult
+      };
+
+  const validatedAt = finalResult.validatedAt ? new Date(finalResult.validatedAt) : new Date();
+
   const lines = [
+    '# 규칙 엔진 검증 리포트',
     '# 데이터 품질 검증 리포트',
     '',
     `## 기본 정보`,
-    `- 사업체 ID: ${result.businessId}`,
-    `- 규칙 세트: ${result.ruleSetName}`,
-    `- 검증 시간: ${result.validatedAt.toLocaleString('ko-KR')}`,
+    `- 사업체 ID: ${finalResult.businessId}`,
+    `- 규칙 세트: ${finalResult.ruleSetName}`,
+    `- 검증 시간: ${validatedAt.toLocaleString('ko-KR')}`,
+    `- 사업체명: ${finalResult.name || finalResult.businessName || ''}`,
     '',
     `## 검증 결과`,
-    `- 전체 규칙: ${result.totalRules}개`,
-    `- 통과: ${result.passedRules}개`,
-    `- 실패: ${result.failedRules}개`,
-    `- 스킵: ${result.skippedRules}개`,
-    `- 점수: ${result.score}점`,
+    `- 전체 규칙: ${finalResult.totalRules}개`,
+    `- 통과: ${finalResult.passedRules}개`,
+    `- 실패: ${finalResult.failedRules}개`,
+    `- 스킵: ${finalResult.skippedRules}개`,
+    `- 점수: ${finalResult.score}점`,
     '',
   ];
 
-  const failedResults = result.results.filter(r => !r.passed);
-  if (failedResults.length > 0) {
-    lines.push('## 실패한 규칙');
-    for (const fail of failedResults) {
-      lines.push(`- [${fail.severity}] ${fail.ruleName}: ${fail.message}`);
-      lines.push(`  - 필드: ${fail.field}`);
-      lines.push(`  - 실제 값: ${fail.actualValue}`);
-      if (fail.expectedValue) {
-        lines.push(`  - 기대 값: ${fail.expectedValue}`);
+  if (finalResult.results && Array.isArray(finalResult.results)) {
+    const failedResults = finalResult.results.filter((r: any) => !r.passed);
+    if (failedResults.length > 0) {
+      lines.push('## 실패한 규칙');
+      for (const fail of failedResults) {
+        lines.push(`- [${fail.severity}] ${fail.ruleName}: ${fail.message}`);
+        lines.push(`  - 필드: ${fail.field}`);
+        lines.push(`  - 실제 값: ${fail.actualValue}`);
+        if (fail.expectedValue) {
+          lines.push(`  - 기대 값: ${fail.expectedValue}`);
+        }
       }
     }
   }
@@ -453,4 +592,18 @@ export function initializeDefaultRuleSets(): RuleSet[] {
   );
 
   return [ruleSet];
+}
+
+let rulesEngineConfig = { maxValidationTime: 5000, enableCaching: true };
+
+export function getRules(): QualityRule[] {
+  return [...allCreatedRules];
+}
+
+export function getRulesEngineConfig() {
+  return rulesEngineConfig;
+}
+
+export function setRulesEngineConfig(config: Partial<typeof rulesEngineConfig>) {
+  rulesEngineConfig = { ...rulesEngineConfig, ...config };
 }

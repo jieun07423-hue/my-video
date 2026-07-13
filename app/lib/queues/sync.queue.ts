@@ -1,5 +1,5 @@
 import { Queue } from 'bullmq';
-import redisConnection from '@/lib/redis';
+import { bullConnection } from '@/lib/redis';
 
 export interface SyncJobData {
   serviceKey: string;
@@ -11,7 +11,7 @@ export interface SyncJobData {
 export const syncQueueName = 'sync-queue';
 
 export const syncQueue = new Queue(syncQueueName, {
-  connection: redisConnection,
+  connection: bullConnection,
   defaultJobOptions: {
     attempts: 3,
     backoff: {

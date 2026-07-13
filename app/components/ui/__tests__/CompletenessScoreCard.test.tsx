@@ -41,7 +41,7 @@ describe('CompletenessScoreCard', () => {
   it('누락된 필드는 빨간색으로 표시해야 한다', () => {
     render(<CompletenessScoreCard {...defaultProps} />);
 
-    expect(screen.getByText('전화번호')).toBeInTheDocument();
+    expect(screen.getAllByText('전화번호')[0]).toBeInTheDocument();
     expect(screen.getByText('누락')).toBeInTheDocument();
   });
 

@@ -8,7 +8,7 @@ import {
   setAIAnalysisConfig,
   getAIAnalysisConfig,
   generateAIAnalysisReport,
-} from '@/lib/services/quality-ai-analysis.service';
+} from '@/lib/services/quality/quality-ai-analysis.service';
 import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: Request) {

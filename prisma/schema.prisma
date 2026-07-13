@@ -47,6 +47,8 @@ model Admin {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   auditLogs    AuditLog[]
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
 
   @@map("admins")
 }
@@ -242,7 +244,145 @@ model SeoulPermit {
   @@map("seoul_permits")
 }
 
+// ---------------------------------------------------------------------------
+// 주문-재고 동기화 모델
+// ---------------------------------------------------------------------------
+
+// 재고 관리 제품
+model Product {
+  id                  String            @id @default(cuid())
+  name                String
+  sku                 String            @unique
+  description         String?
+  price               Decimal           @db.Decimal(10, 2)
+  stockQuantity       Int?              @map("stock_quantity") // null = 재고 미관리(무제한)
+  lowStockThreshold   Int               @default(5) @map("low_stock_threshold")
+  isSoldOut           Boolean           @default(false) @map("is_sold_out")
+  isActive            Boolean           @default(true) @map("is_active")
+  category            String?
+
+  createdAt           DateTime          @default(now()) @map("created_at")
+  updatedAt           DateTime          @updatedAt @map("updated_at")
+
+  orderItems          OrderItem[]
+  stockHistories      StockHistory[]
+
+  @@index([sku])
+  @@index([category])
+  @@index([isActive, stockQuantity])
+  @@map("products")
+}
+
+// 주문 상태
+enum OrderStatus {
+  pending       // 대기
+  confirmed     // 확인
+  processing    // 처리중
+  completed     // 완료
+  cancelled     // 취소
+}
+
+// 주문
+model Order {
+  id                String            @id @default(cuid())
+  orderNumber       String            @unique @map("order_number")
+  storeId           String            @map("store_id")
+  status            OrderStatus       @default(pending)
+  totalAmount       Decimal           @map("total_amount") @db.Decimal(12, 2)
+  notes             String?
+
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  items             OrderItem[]
+  stockHistories    StockHistory[]
+
+  @@index([storeId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@map("orders")
+}
+
+// 주문 아이템
+model OrderItem {
+  id                String            @id @default(cuid())
+  orderId           String            @map("order_id")
+  productId         String            @map("product_id")
+  quantity          Int
+  unitPrice         Decimal           @map("unit_price") @db.Decimal(10, 2)
+  subtotal          Decimal           @db.Decimal(12, 2)
+
+  order             Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product           Product           @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+// 재고 변동 유형
+enum StockChangeType {
+  order             // 주문 출고
+  cancel            // 주문 취소 복구
+  adjustment        // 수동 조정
+  restock           // 입고
+}
+
+// 재고 변동 이력
+model StockHistory {
+  id                String            @id @default(cuid())
+  productId         String            @map("product_id")
+  orderId           String?           @map("order_id")
+  changeType        StockChangeType
+  quantityChange    Int               @map("quantity_change") // 양수=입고, 음수=출고
+  quantityAfter     Int               @map("quantity_after")
+  reason            String?
+
+  createdAt         DateTime          @default(now()) @map("created_at")
+
+  product           Product           @relation(fields: [productId], references: [id])
+  order             Order?            @relation(fields: [orderId], references: [id])
+
+  @@index([productId, createdAt(sort: Desc)])
+  @@index([orderId])
+  @@map("stock_histories")
+}
+
+// ---------------------------------------------------------------------------
+// 사업체 소유권 승인 요청
+// ---------------------------------------------------------------------------
+
+// 요청 상태
+enum ClaimRequestStatus {
+  pending       // 대기
+  approved      // 승인됨
+  rejected      // 거절됨
+  cancelled     // 취소됨
+}
+
+model BusinessClaimRequest {
+  id              String              @id @default(cuid())
+  businessId      String              @map("business_id") // 소유권을 요청할 Business 레코드 ID
+  requesterName   String              @map("requester_name") // 요청자 이름
+  requesterContact String             @map("requester_contact") // 요청자 연락처
+  requesterNote   String?             @map("requester_note") // 요청 사유
+  status          ClaimRequestStatus  @default(pending)
+  adminNote       String?             @map("admin_note") // 관리자 처리 메모
+  reviewedBy      String?             @map("reviewed_by") // 처리 관리자 ID
+  reviewedAt      DateTime?           @map("reviewed_at")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  business        Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([businessId])
+  @@index([requesterName])
+  @@map("business_claim_requests")
+}
+
+// ---------------------------------------------------------------------------
 // 노트 (소프트 삭제 지원)
+// ---------------------------------------------------------------------------
 model Note {
   id          String   @id @default(cuid())
   businessId  String   @map("business_id") // 소속 비즈니스 ID
@@ -258,4 +398,80 @@ model Note {
   @@index([businessId, deletedAt])
   @@index([deletedAt])
   @@map("notes")
+}
+
+// ---------------------------------------------------------------------------
+// 웹훅 시스템
+// ---------------------------------------------------------------------------
+
+// 웹훅 발송 상태
+enum WebhookDeliveryStatus {
+  pending    // 대기
+  success    // 성공
+  failed     // 실패 (재시도 소진)
+}
+
+// 등록된 웹훅 엔드포인트
+model WebhookEndpoint {
+  id            String   @id @default(cuid())
+  name          String                           // 식별명 (예: "ERP 연동", "알림톡")
+  url           String                           // 콜백 URL
+  secret        String?                          // 서명 검증용 비밀키
+  events        String[]                         // 구독 이벤트 목록 (["order.created", "stock.shortage"])
+  isActive      Boolean  @default(true) @map("is_active")
+  maxRetries    Int      @default(3) @map("max_retries")
+  timeoutMs     Int      @default(5000) @map("timeout_ms")
+
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  deliveryLogs  WebhookDeliveryLog[]
+
+  @@index([isActive])
+  @@index([events])
+  @@map("webhook_endpoints")
+}
+
+// 웹훅 전송 로그
+model WebhookDeliveryLog {
+  id              String                @id @default(cuid())
+  endpointId      String                @map("endpoint_id")
+  eventType       String                @map("event_type") // "order.created", "stock.shortage" 등
+  payload         Json                              // 당시 전송 payload
+  status          WebhookDeliveryStatus @default(pending)
+  responseCode    Int?                  @map("response_code") // HTTP 응답 코드
+  responseBody    String?               @map("response_body")
+  errorMessage    String?               @map("error_message")
+  attempt         Int                   @default(1)      // 몇 번째 시도
+  maxRetries      Int                   @default(3)      @map("max_retries")
+  nextRetryAt     DateTime?             @map("next_retry_at")
+
+  createdAt       DateTime              @default(now()) @map("created_at")
+
+  endpoint        WebhookEndpoint       @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([endpointId, createdAt(sort: Desc)])
+  @@index([status, nextRetryAt])
+  @@index([eventType, createdAt(sort: Desc)])
+  @@map("webhook_delivery_logs")
+}
+
+// ---------------------------------------------------------------------------
+// 채팅 메시지
+// ---------------------------------------------------------------------------
+
+model Message {
+  id          String   @id @default(cuid())
+  content     String   // 메시지 내용
+  senderId    String   @map("sender_id") // 발신자 ID (Admin.id)
+  receiverId  String   @map("receiver_id") // 수신자 ID (Admin.id)
+  isRead      Boolean  @default(false) @map("is_read") // 읽음 여부
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  sender      Admin    @relation("SentMessages", fields: [senderId], references: [id])
+  receiver    Admin    @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  @@index([senderId, receiverId, createdAt(sort: Desc)])
+  @@index([receiverId, isRead])
+  @@map("messages")
 }

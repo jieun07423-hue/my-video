@@ -13,7 +13,7 @@ import {
   initializeDefaultRuleSets,
   setRulesEngineConfig,
   getRulesEngineConfig,
-} from '@/lib/services/quality-rules-engine.service';
+} from '@/lib/services/quality/quality-rules-engine.service';
 import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: Request) {

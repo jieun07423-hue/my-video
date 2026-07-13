@@ -11,7 +11,7 @@ import {
   setCorrelationConfig,
   getCorrelationConfig,
   generateCorrelationReport,
-} from '@/lib/services/quality-correlation.service';
+} from '@/lib/services/quality/quality-correlation.service';
 import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: Request) {

@@ -7,7 +7,7 @@ import {
   setPredictionConfig,
   getPredictionConfig,
   generatePredictionReport,
-} from '@/lib/services/quality-prediction.service';
+} from '@/lib/services/quality/quality-prediction.service';
 import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: Request) {

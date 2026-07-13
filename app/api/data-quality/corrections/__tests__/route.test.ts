@@ -1,14 +1,19 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
-import { GET, POST } from '../route';
-import { businessRepository } from '@/lib/repositories/business.repository';
-import { NextRequest } from 'next/server';
+jest.mock('../../../../lib/repositories/business.repository', () => ({
+  businessRepository: {
+    search: jest.fn(),
+    findByBizesId: jest.fn(),
+  },
+}));
 
-jest.mock('@/lib/repositories/business.repository');
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { NextRequest } from 'next/server';
 
 describe('/api/data-quality/corrections', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('returns correction analysis results', async () => {
+    const { GET } = await import('../route');
+    const { businessRepository } = await import('../../../../lib/repositories/business.repository');
     const mockResponse = {
       items: [
         {
@@ -33,7 +38,7 @@ describe('/api/data-quality/corrections', () => {
       limit: 1000,
     };
 
-    jest.mocked(businessRepository.search).mockResolvedValue(mockResponse);
+    jest.mocked(businessRepository.search).mockResolvedValue(mockResponse as any);
 
     const request = { url: 'http://localhost:3000/api/data-quality/corrections' } as NextRequest;
     const response = await GET(request);
@@ -51,6 +56,7 @@ describe('/api/data-quality/corrections', () => {
   });
 
   it('returns correction history when action=history', async () => {
+    const { GET } = await import('../route');
     const request = { url: 'http://localhost:3000/api/data-quality/corrections?action=history' } as NextRequest;
     const response = await GET(request);
     const data = await response.json();
@@ -62,6 +68,7 @@ describe('/api/data-quality/corrections', () => {
   });
 
   it('returns correction history for specific business', async () => {
+    const { GET } = await import('../route');
     const request = { url: 'http://localhost:3000/api/data-quality/corrections?action=history&businessId=1234567890' } as NextRequest;
     const response = await GET(request);
     const data = await response.json();
@@ -73,6 +80,8 @@ describe('/api/data-quality/corrections', () => {
   });
 
   it('handles POST analyze action', async () => {
+    const { POST } = await import('../route');
+    const { businessRepository } = await import('../../../../lib/repositories/business.repository');
     const mockBusiness = {
       bizesId: '1234567890',
       name: '테스트 사업자',
@@ -90,7 +99,7 @@ describe('/api/data-quality/corrections', () => {
       updatedAt: new Date(),
     };
 
-    jest.mocked(businessRepository.findByBizesId).mockResolvedValue(mockBusiness);
+    jest.mocked(businessRepository.findByBizesId).mockResolvedValue(mockBusiness as any);
 
     const request = new Request('http://localhost:3000/api/data-quality/corrections', {
       method: 'POST',
@@ -112,6 +121,7 @@ describe('/api/data-quality/corrections', () => {
   });
 
   it('handles POST apply action', async () => {
+    const { POST } = await import('../route');
     const mockSuggestions = [
       {
         businessId: '1234567890',
@@ -146,6 +156,7 @@ describe('/api/data-quality/corrections', () => {
   });
 
   it('handles POST errors', async () => {
+    const { POST } = await import('../route');
     const request = new Request('http://localhost:3000/api/data-quality/corrections', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -160,6 +171,8 @@ describe('/api/data-quality/corrections', () => {
   });
 
   it('handles GET errors', async () => {
+    const { GET } = await import('../route');
+    const { businessRepository } = await import('../../../../lib/repositories/business.repository');
     jest.mocked(businessRepository.search).mockRejectedValue(new Error('Database error'));
 
     const request = { url: 'http://localhost:3000/api/data-quality/corrections' } as NextRequest;

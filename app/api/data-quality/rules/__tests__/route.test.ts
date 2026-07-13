@@ -1,5 +1,10 @@
+jest.mock('../../../../lib/repositories/business.repository', () => ({
+  businessRepository: {
+    findByBizesId: jest.fn(),
+  },
+}));
+
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { businessRepository } from '@/lib/repositories/business.repository';
 import {
   validateBusiness,
   getValidationStats,
@@ -7,9 +12,7 @@ import {
   getRuleSets,
   initializeDefaultRuleSets,
   setRulesEngineConfig,
-} from '@/lib/services/quality-rules-engine.service';
-
-jest.mock('@/lib/repositories/business.repository');
+} from '../../../../lib/services/quality/quality-rules-engine.service';
 
 describe('/api/data-quality/rules', () => {
   beforeEach(() => {
@@ -19,6 +22,8 @@ describe('/api/data-quality/rules', () => {
 
   describe('GET', () => {
     it('should validate a business', async () => {
+      const { GET } = await import('../route');
+      const { businessRepository } = await import('../../../../lib/repositories/business.repository');
       const mockBusiness = {
         bizesId: '1234567890',
         name: '테스트 사업장',

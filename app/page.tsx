@@ -116,7 +116,7 @@ export default function HomePage() {
                 transition: 'transform 0.3s ease'
               }}>
                 <Zap size={20} />
-               广告生成 바로가기
+               광고 생성 바로가기
                 <ArrowRight size={20} />
               </Link>
 

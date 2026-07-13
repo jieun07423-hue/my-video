@@ -105,7 +105,7 @@ export async function sendNotification(
   message: string,
   data?: any
 ): Promise<Notification> {
-  const notification: Notification = {
+  const notification: Notification & { timestamp?: Date } = {
     id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     type,
     severity,
@@ -114,6 +114,8 @@ export async function sendNotification(
     data,
     status: 'pending',
     channels: [],
+    sentAt: new Date(),
+    timestamp: new Date(),
   };
 
   try {

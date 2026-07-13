@@ -6,7 +6,7 @@ import {
   getFieldLineage,
   generateLineageReport,
   exportLineage,
-} from '@/lib/services/data-lineage.service';
+} from '@/lib/services/quality/data-lineage.service';
 import { apiLogger } from '@/lib/logger';
 import { createApiErrorResponse } from '@/lib/api/handlers';
 

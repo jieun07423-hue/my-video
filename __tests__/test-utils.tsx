@@ -14,11 +14,6 @@ function createTestQueryClient() {
         gcTime: 0,
       },
     },
-    logger: {
-      log: console.log,
-      warn: console.warn,
-      error: () => {},
-    },
   })
 }
 

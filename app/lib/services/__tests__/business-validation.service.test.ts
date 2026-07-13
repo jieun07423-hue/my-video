@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import {
   validateBusinessRegistration,
@@ -9,16 +10,32 @@ import {
   getCacheStats,
 } from '../business-validation.service';
 
-jest.mock('axios', () => ({
-  get: jest.fn(),
-  isAxiosError: jest.fn(),
-}));
-
 describe('business-validation.service', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.DATA_GO_KR_SERVICE_KEY = 'test-service-key';
     clearCache();
+
+    jest.mocked(axios.get).mockResolvedValue({
+      data: {
+        response: {
+          body: {
+            items: {
+              item: [
+                {
+                  entrpsNm: '테스트 기업',
+                  rprsntvNm: '홍길동',
+                  trdStateNm: '영업중',
+                  sttDt: '20200101',
+                  tfdt: '',
+                  adres: '서울시 강남구',
+                }
+              ]
+            }
+          }
+        }
+      }
+    });
   });
 
   describe('calculateCheckDigit', () => {

@@ -7,7 +7,7 @@ import {
   generateScoreReport,
   setScoringConfig,
   getScoringConfig,
-} from '../quality-scoring.service';
+} from '../quality/quality-scoring.service';
 
 describe('QualityScoringService', () => {
   beforeEach(() => {

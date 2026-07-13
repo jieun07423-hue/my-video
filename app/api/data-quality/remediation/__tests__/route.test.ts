@@ -10,7 +10,7 @@ import {
   getRemediationStats,
   setRemediationConfig,
   getRemediationConfig,
-} from '@/lib/services/quality-auto-remediation.service';
+} from '@/lib/services/quality/quality-auto-remediation.service';
 
 describe('/api/data-quality/remediation', () => {
   beforeEach(() => {

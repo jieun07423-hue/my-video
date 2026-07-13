@@ -5,7 +5,7 @@ import {
   getNotificationConfig,
   setNotificationConfig,
   getNotificationStats,
-} from '@/lib/services/quality-enhanced-notification.service';
+} from '@/lib/services/quality/quality-enhanced-notification.service';
 
 describe('/api/data-quality/notifications', () => {
   beforeEach(() => {

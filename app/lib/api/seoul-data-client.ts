@@ -135,7 +135,7 @@ export function getAllPermitTypes(): Array<{ code: string; name: string; source:
     { code: 'LOCALDATA_031010', name: '옥외광고업', source: '서울시전체' },
     { code: 'LOCALDATA_032001', name: '일반운전면허학원', source: '서울시전체' },
     { code: 'LOCALDATA_032002', name: '소규모운전학원', source: '서울시전체' },
-    { code: 'LOCALDATA_032003', name: '부품拆Motorcycle학원', source: '서울시전체' },
+    { code: 'LOCALDATA_032003', name: '이륜차부품학원', source: '서울시전체' },
     { code: 'LOCALDATA_033001', name: '학원', source: '서울시전체' },
     { code: 'LOCALDATA_033002', name: '교습소', source: '서울시전체' },
     { code: 'LOCALDATA_033003', name: '독서실', source: '서울시전체' },

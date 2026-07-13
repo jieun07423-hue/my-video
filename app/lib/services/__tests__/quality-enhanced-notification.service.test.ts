@@ -10,7 +10,7 @@ import {
   getNotificationHistory,
   getNotificationStats,
   generateNotificationReport,
-} from '../quality-enhanced-notification.service';
+} from '../quality/quality-enhanced-notification.service';
 
 describe('QualityEnhancedNotificationService', () => {
   beforeEach(() => {

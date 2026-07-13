@@ -7,7 +7,7 @@ import {
   formatReportAsMarkdown,
   setReportConfig,
   getReportConfig,
-} from '../quality-automated-reporting.service';
+} from '../quality/quality-automated-reporting.service';
 
 describe('QualityAutomatedReportingService', () => {
   describe('generateQualityReport', () => {

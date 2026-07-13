@@ -12,7 +12,7 @@ import {
   setSLAConfig,
   getSLAConfig,
   generateSLAReportText,
-} from '@/lib/services/quality-sla.service';
+} from '@/lib/services/quality/quality-sla.service';
 import { apiLogger } from '@/lib/logger';
 
 export async function GET(request: Request) {

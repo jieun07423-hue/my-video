@@ -9,7 +9,7 @@ import {
   getMeasurements,
   generateSLAReport,
   getSLAStats,
-} from '../quality-sla.service';
+} from '../quality/quality-sla.service';
 
 describe('QualitySLAService', () => {
   describe('SLA management', () => {
