@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Navbar from '@/app/components/Navbar';
+import Navbar from '@/components/Navbar';
 
 // ---------------------------------------------------------------------------
 // Types

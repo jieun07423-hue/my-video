@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import Navbar from '@/app/components/Navbar';
+import Navbar from '@/components/Navbar';
 
 const ADMIN_NAV_ITEMS = [
   { href: '/admin', label: '대시보드' },

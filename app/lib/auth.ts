@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import db, { getPrismaClientInstance } from './db'
-import { adminRepository } from '@/app/lib/repositories/admin.repository'
+import { adminRepository } from '@/lib/repositories/admin.repository'
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import type { DefaultSession } from '@auth/core/types'
