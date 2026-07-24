@@ -163,15 +163,22 @@ enum RecordStatus { new, synced, verified }
 
 ## Prisma Config
 
-```typescript
+```prisma
 generator client {
   provider = "prisma-client-js"
+  // 기본 출력: node_modules/.prisma/client
+  // 커스텀 출력이 필요한 경우: output = "app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+```
+
+**Import Pattern:**
+```typescript
+import { PrismaClient } from '@prisma/client';  // 기본 경로 사용
 ```
 
 ## Deployment

@@ -7,7 +7,9 @@ import Navbar from '@/components/Navbar';
 const ADMIN_NAV_ITEMS = [
   { href: '/admin', label: '대시보드' },
   { href: '/admin/claims', label: '승인 요청' },
+  { href: '/admin/products', label: '메뉴 관리' },
   { href: '/admin/webhooks', label: '웹훅 관리' },
+  { href: '/admin/settings', label: '시스템 설정' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

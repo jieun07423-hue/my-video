@@ -55,6 +55,13 @@ interface MockAuditLogRow {
   [key: string]: unknown;
 }
 
+interface MockSystemSettingRow {
+  key: string;
+  value: string;
+  updatedAt: Date;
+  createdAt: Date;
+}
+
 // ---------------------------------------------------------------------------
 // In-memory mock data stores (테스트 간 격리를 위해 module-level 배열 사용)
 // ---------------------------------------------------------------------------
@@ -64,6 +71,7 @@ const mockAdCopies: MockCopyRow[] = [];
 const mockSeoulPermits: MockPermitRow[] = [];
 const mockSyncStates: MockSyncStateRow[] = [];
 const mockNoteData: MockNoteRow[] = [];
+const mockSystemSettingData: MockSystemSettingRow[] = [];
 
 // 주문-재고 mock 데이터
 let mockProductIdCounter = 1;
@@ -420,6 +428,40 @@ const mockBusinessClaimRequest = {
   },
 };
 
+const mockSystemSetting = {
+  findUnique: async (args: { where: { key: string } }) => {
+    return mockSystemSettingData.find((s) => s.key === args.where.key) || null;
+  },
+  findMany: async () => mockSystemSettingData,
+  upsert: async (args: { where: { key: string }; create: { key: string; value: string }; update: { value: string } }) => {
+    const idx = mockSystemSettingData.findIndex((s) => s.key === args.where.key);
+    if (idx !== -1) {
+      mockSystemSettingData[idx] = {
+        ...mockSystemSettingData[idx],
+        value: args.update.value,
+        updatedAt: new Date()
+      };
+      return mockSystemSettingData[idx];
+    } else {
+      const row = {
+        key: args.create.key,
+        value: args.create.value,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      mockSystemSettingData.push(row);
+      return row;
+    }
+  },
+  delete: async (args: { where: { key: string } }) => {
+    const idx = mockSystemSettingData.findIndex((s) => s.key === args.where.key);
+    if (idx !== -1) {
+      return mockSystemSettingData.splice(idx, 1)[0];
+    }
+    throw new Error('Record to delete does not exist.');
+  }
+};
+
 // ---------------------------------------------------------------------------
 // Mock DbClient 생성 / 리셋
 // ---------------------------------------------------------------------------
@@ -445,6 +487,7 @@ export function createMockDb(): DbClient {
     webhookEndpoint: mockWebhookEndpoint as unknown as DbClient['webhookEndpoint'],
     webhookDeliveryLog: mockWebhookDeliveryLog as unknown as DbClient['webhookDeliveryLog'],
     businessClaimRequest: mockBusinessClaimRequest as unknown as DbClient['businessClaimRequest'],
+    systemSetting: mockSystemSetting as unknown as DbClient['systemSetting'],
     $connect: async () => {
       dbLogger.info('Mock 데이터베이스 모드 사용 중');
     },
@@ -475,6 +518,7 @@ export function resetMockData(): void {
   mockWebhookEndpointData.length = 0;
   mockWebhookDeliveryLogData.length = 0;
   mockClaimRequestData.length = 0;
+  mockSystemSettingData.length = 0;
   mockProductIdCounter = 1;
   mockOrderIdCounter = 1;
   mockEndpointIdCounter = 1;
