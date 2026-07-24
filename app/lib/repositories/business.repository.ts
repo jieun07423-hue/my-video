@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { dbLogger } from '../logger';
 import db from '@/lib/db';
 
@@ -64,7 +65,7 @@ export class BusinessRepository {
     const { search, status, recordStatus, businessCode, page = 1, limit = 20 } = options;
 
     // 실제 Prisma 쿼리 조건 생성
-    const where: any = {};
+    const where: Prisma.BusinessWhereInput = {};
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },

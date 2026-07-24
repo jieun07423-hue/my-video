@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import Navbar from '../components/Navbar';
 import { Sparkles, Zap, Loader2, ChevronDown, ChevronUp, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 
@@ -86,22 +86,21 @@ export default function AdPage() {
   }, [industry, location, target, goal, strengths, keywords, tone]);
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)' }}>
+    <div className="min-h-screen bg-gradient-to-b from-[#1a1a2e] to-[#16213e]">
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 pt-24 pb-16">
         <div className="mb-10 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#4a90d9] bg-[rgba(74,144,217,0.1)] px-4 py-1.5">
-            <Sparkles size={16} color="#4a90d9" />
-            <span className="text-sm" style={{ color: '#a0a0b0' }}>AI Powered Advertising</span>
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-500 bg-blue-500/10 px-4 py-1.5">
+            <Sparkles size={16} className="text-blue-500" />
+            <span className="text-sm text-gray-400">AI Powered Advertising</span>
           </div>
           <h1 className="mb-3 text-4xl font-bold text-white">광고 카피 생성</h1>
-          <p className="text-lg" style={{ color: '#a0a0b0' }}>
+          <p className="text-lg text-gray-400">
             AI가 당신의 사업에 맞는 고전환 광고 카피를 만들어드립니다
           </p>
         </div>
 
-        {/* 입력 폼 */}
-        <div className="mb-8 rounded-2xl p-6" style={{ background: 'rgba(22, 33, 62, 0.8)', border: '1px solid #2d2d4a' }}>
+        <div className="mb-8 rounded-2xl bg-[#16213e]/80 p-6 border border-gray-700">
           <div className="mb-6">
             <label className="mb-3 block text-sm font-medium text-white">업종 선택</label>
             <div className="flex flex-wrap gap-2">
@@ -109,12 +108,11 @@ export default function AdPage() {
                 <button
                   key={item.label}
                   onClick={() => setIndustry(item.label)}
-                  className="rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200"
-                  style={{
-                    background: industry === item.label ? '#4a90d9' : 'rgba(74, 144, 217, 0.1)',
-                    color: industry === item.label ? '#ffffff' : '#a0a0b0',
-                    border: industry === item.label ? '1px solid #4a90d9' : '1px solid #2d2d4a',
-                  }}
+                  className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
+                    industry === item.label
+                      ? 'bg-blue-500 text-white border border-blue-500'
+                      : 'bg-blue-500/10 text-gray-400 border border-gray-700'
+                  }`}
                 >
                   {item.emoji} {item.label}
                 </button>
@@ -133,12 +131,7 @@ export default function AdPage() {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="예: 강남, 홍대, 부산"
-                className="w-full rounded-xl px-4 py-2.5 text-sm outline-none transition-all duration-200 placeholder:text-sm"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid #2d2d4a',
-                  color: '#ffffff',
-                }}
+                className="w-full rounded-xl bg-white/5 border border-gray-700 px-4 py-2.5 text-sm text-white outline-none transition-all duration-200 placeholder:text-sm"
               />
             </div>
             <div>
@@ -151,12 +144,7 @@ export default function AdPage() {
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
                 placeholder="예: 30대 여성, 직장인"
-                className="w-full rounded-xl px-4 py-2.5 text-sm outline-none transition-all duration-200 placeholder:text-sm"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid #2d2d4a',
-                  color: '#ffffff',
-                }}
+                className="w-full rounded-xl bg-white/5 border border-gray-700 px-4 py-2.5 text-sm text-white outline-none transition-all duration-200 placeholder:text-sm"
               />
             </div>
           </div>
@@ -172,12 +160,7 @@ export default function AdPage() {
                 value={goal}
                 onChange={(e) => setGoal(e.target.value)}
                 placeholder="예: 예약 유도, 방문 유도"
-                className="w-full rounded-xl px-4 py-2.5 text-sm outline-none transition-all duration-200 placeholder:text-sm"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid #2d2d4a',
-                  color: '#ffffff',
-                }}
+                className="w-full rounded-xl bg-white/5 border border-gray-700 px-4 py-2.5 text-sm text-white outline-none transition-all duration-200 placeholder:text-sm"
               />
             </div>
             <div>
@@ -190,12 +173,7 @@ export default function AdPage() {
                 value={strengths}
                 onChange={(e) => setStrengths(e.target.value)}
                 placeholder="예: 통증 최소화, 20년 경력"
-                className="w-full rounded-xl px-4 py-2.5 text-sm outline-none transition-all duration-200 placeholder:text-sm"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid #2d2d4a',
-                  color: '#ffffff',
-                }}
+                className="w-full rounded-xl bg-white/5 border border-gray-700 px-4 py-2.5 text-sm text-white outline-none transition-all duration-200 placeholder:text-sm"
               />
             </div>
           </div>
@@ -210,12 +188,7 @@ export default function AdPage() {
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
               placeholder="예: 임플란트, 무료상담, 강남역"
-              className="w-full rounded-xl px-4 py-2.5 text-sm outline-none transition-all duration-200 placeholder:text-sm"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid #2d2d4a',
-                color: '#ffffff',
-              }}
+              className="w-full rounded-xl bg-white/5 border border-gray-700 px-4 py-2.5 text-sm text-white outline-none transition-all duration-200 placeholder:text-sm"
             />
           </div>
 
@@ -226,12 +199,11 @@ export default function AdPage() {
                 <button
                   key={option}
                   onClick={() => setTone(option)}
-                  className="rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200"
-                  style={{
-                    background: tone === option ? '#4a90d9' : 'rgba(255,255,255,0.05)',
-                    color: tone === option ? '#ffffff' : '#a0a0b0',
-                    border: tone === option ? '1px solid #4a90d9' : '1px solid #2d2d4a',
-                  }}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+                    tone === option
+                      ? 'bg-blue-500 text-white border border-blue-500'
+                      : 'bg-white/5 text-gray-400 border border-gray-700'
+                  }`}
                 >
                   {option}
                 </button>
@@ -242,10 +214,7 @@ export default function AdPage() {
           <button
             onClick={handleGenerate}
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-base font-semibold text-white shadow-lg transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
-            style={{
-              background: 'linear-gradient(90deg, #4a90d9 0%, #357abd 100%)',
-            }}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? (
               <>
@@ -261,34 +230,31 @@ export default function AdPage() {
           </button>
 
           {error && (
-            <div className="mt-4 flex items-start gap-2 rounded-xl p-4" style={{ background: 'rgba(233, 69, 96, 0.1)', border: '1px solid rgba(233, 69, 96, 0.3)' }}>
-              <AlertCircle size={18} color="#e94560" className="mt-0.5 shrink-0" />
-              <p className="text-sm" style={{ color: '#e94560' }}>{error}</p>
+            <div className="mt-4 flex items-start gap-2 rounded-xl bg-rose-500/10 border border-rose-500/30 p-4">
+              <AlertCircle size={18} className="mt-0.5 shrink-0 text-rose-500" />
+              <p className="text-sm text-rose-500">{error}</p>
             </div>
           )}
         </div>
 
-        {/* 결과 표시 */}
         {result && (
           <div className="space-y-6">
-            {/* 최종 3개 */}
-            <div className="rounded-2xl p-6" style={{ background: 'rgba(74, 144, 217, 0.08)', border: '1px solid rgba(74, 144, 217, 0.3)' }}>
+            <div className="rounded-2xl bg-blue-500/8 border border-blue-500/30 p-6">
               <div className="mb-4 flex items-center gap-2">
-                <CheckCircle size={20} color="#4a90d9" />
+                <CheckCircle size={20} className="text-blue-500" />
                 <h2 className="text-lg font-bold text-white">최종 추천 광고 카피</h2>
               </div>
               <div className="grid gap-3">
                 {result.finalCopies.map((copy, i) => (
                   <div
                     key={i}
-                    className="rounded-xl p-4"
-                    style={{ background: 'rgba(74, 144, 217, 0.1)', border: '1px solid rgba(74, 144, 217, 0.2)' }}
+                    className="rounded-xl bg-blue-500/10 border border-blue-500/20 p-4"
                   >
                     <div className="mb-1 flex items-center gap-2">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold text-white" style={{ background: '#4a90d9' }}>
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-white">
                         {i + 1}
                       </span>
-                      <span className="text-xs font-medium" style={{ color: '#4a90d9' }}>추천</span>
+                      <span className="text-xs font-medium text-blue-500">추천</span>
                     </div>
                     <p className="text-base leading-relaxed text-white">{copy}</p>
                   </div>
@@ -296,43 +262,40 @@ export default function AdPage() {
               </div>
             </div>
 
-            {/* Top 5 */}
-            <div className="rounded-2xl p-6" style={{ background: 'rgba(22, 33, 62, 0.8)', border: '1px solid #2d2d4a' }}>
+            <div className="rounded-2xl bg-[#16213e]/80 border border-gray-700 p-6">
               <h2 className="mb-4 text-lg font-bold text-white">2차 필터링 (Top 5)</h2>
               <div className="space-y-2">
                 {result.top5Copies.map((copy, i) => (
                   <div
                     key={i}
-                    className="rounded-xl p-3.5"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid #2d2d4a' }}
+                    className="rounded-xl bg-white/3 border border-gray-700 p-3.5"
                   >
-                    <p className="text-sm leading-relaxed" style={{ color: '#c0c0d0' }}>{copy}</p>
+                    <p className="text-sm leading-relaxed text-gray-300">{copy}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* 전체 20개 (접기 가능) */}
-            <div className="rounded-2xl" style={{ background: 'rgba(22, 33, 62, 0.8)', border: '1px solid #2d2d4a' }}>
+            <div className="rounded-2xl bg-[#16213e]/80 border border-gray-700">
               <button
                 onClick={() => setShowAllCopies(!showAllCopies)}
                 className="flex w-full items-center justify-between p-4 text-left"
               >
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-white">전체 초안 ({result.initialCopies.length}개)</span>
-                  <span className="rounded-full px-2 py-0.5 text-xs" style={{ background: 'rgba(255,255,255,0.05)', color: '#a0a0b0' }}>
+                  <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-gray-400">
                     1차 생성
                   </span>
                 </div>
-                {showAllCopies ? <ChevronUp size={18} color="#a0a0b0" /> : <ChevronDown size={18} color="#a0a0b0" />}
+                {showAllCopies ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
               </button>
               {showAllCopies && (
-                <div className="border-t px-4 pb-4 pt-2" style={{ borderColor: '#2d2d4a' }}>
+                <div className="border-t border-gray-700 px-4 pb-4 pt-2">
                   <div className="space-y-1.5">
                     {result.initialCopies.map((copy, i) => (
-                      <div key={i} className="flex items-start gap-2 rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                        <span className="mt-0.5 shrink-0 text-xs font-medium" style={{ color: '#4a90d9', minWidth: '24px' }}>{i + 1}.</span>
-                        <p className="text-sm leading-relaxed" style={{ color: '#888' }}>{copy}</p>
+                      <div key={i} className="flex items-start gap-2 rounded-lg bg-white/2 p-2">
+                        <span className="mt-0.5 shrink-0 text-xs font-medium text-blue-500 min-w-[24px]">{i + 1}.</span>
+                        <p className="text-sm leading-relaxed text-gray-500">{copy}</p>
                       </div>
                     ))}
                   </div>
@@ -340,9 +303,8 @@ export default function AdPage() {
               )}
             </div>
 
-            {/* 메타 정보 */}
-            <div className="flex items-center justify-between rounded-xl p-4" style={{ background: 'rgba(22, 33, 62, 0.6)', border: '1px solid #2d2d4a' }}>
-              <div className="flex items-center gap-3 text-xs" style={{ color: '#a0a0b0' }}>
+            <div className="flex items-center justify-between rounded-xl bg-[#16213e]/60 border border-gray-700 p-4">
+              <div className="flex items-center gap-3 text-xs text-gray-400">
                 <span>생성 시간: {(result.duration / 1000).toFixed(1)}초</span>
                 <span>|</span>
                 <span>업종: {result.campaign.industry}</span>
@@ -354,8 +316,7 @@ export default function AdPage() {
                   setResult(null);
                   setShowAllCopies(false);
                 }}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200"
-                style={{ background: 'rgba(74, 144, 217, 0.1)', color: '#4a90d9' }}
+                className="flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-3 py-1.5 text-xs font-medium text-blue-500 transition-all duration-200"
               >
                 <RefreshCw size={14} />
                 새로 생성

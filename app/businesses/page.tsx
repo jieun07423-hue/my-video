@@ -33,7 +33,19 @@ interface SearchParams {
   limit?: number;
 }
 
-function BusinessTable({ businesses, isLoading }: { businesses: any[]; isLoading?: boolean }) {
+interface Business {
+  id: string;
+  bizesId: string;
+  name: string;
+  roadNameAddress: string | null;
+  lotNumberAddress: string | null;
+  businessName: string | null;
+  status: string;
+  recordStatus: string;
+  createdAt: string;
+}
+
+function BusinessTable({ businesses, isLoading }: { businesses: Business[]; isLoading?: boolean }) {
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -330,7 +342,7 @@ export default function BusinessesPage() {
                 </label>
                 <select
                   value={searchParams.status || ''}
-                  onChange={(e) => setSearchParams({ ...searchParams, status: e.target.value as any })}
+                  onChange={(e) => setSearchParams({ ...searchParams, status: e.target.value as SearchParams['status'] })}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                 >
                   <option value="">전체 상태</option>
@@ -347,7 +359,7 @@ export default function BusinessesPage() {
                 </label>
                 <select
                   value={searchParams.recordStatus || ''}
-                  onChange={(e) => setSearchParams({ ...searchParams, recordStatus: e.target.value as any })}
+                  onChange={(e) => setSearchParams({ ...searchParams, recordStatus: e.target.value as SearchParams['recordStatus'] })}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                 >
                   <option value="">전체 상태</option>
