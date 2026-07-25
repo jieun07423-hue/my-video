@@ -21,7 +21,7 @@ export async function requireRole(allowedRoles: AdminRole[]) {
     return null;
   }
   
-  const userRole = session.user?.role as AdminRole;
+  const userRole = (session.user as { role?: AdminRole } | undefined)?.role;
   
   if (!userRole || !allowedRoles.includes(userRole)) {
     return null;
@@ -43,15 +43,15 @@ export async function checkPermission(requiredRole: AdminRole = 'admin') {
     };
   }
   
-  const userRole = session.user?.role as AdminRole;
+  const userRole = (session.user as { role?: AdminRole } | undefined)?.role;
   const roleHierarchy: Record<AdminRole, number> = {
     super_admin: 3,
     admin: 2,
     viewer: 1,
   };
   
-  if (roleHierarchy[userRole] < roleHierarchy[requiredRole]) {
-    apiLogger.warn({ userId: session.user.id, userRole, requiredRole }, '권한 부족');
+  if (!userRole || roleHierarchy[userRole] < roleHierarchy[requiredRole]) {
+    apiLogger.warn({ userId: (session.user as { id?: string } | undefined)?.id, userRole, requiredRole }, '권한 부족');
     return { 
       allowed: false, 
       response: NextResponse.json(

@@ -49,7 +49,7 @@ export async function syncWorker(date?: string): Promise<SyncStats> {
 
       const response = await fetchBusinessesByDate(syncDate, pageNo, numOfRows);
 
-      if (!response.body?.items || response.body.items.length === 0) {
+      if (!response?.body?.items || response.body.items.length === 0) {
         hasMoreData = false;
         break;
       }
@@ -109,7 +109,7 @@ export async function syncWorker(date?: string): Promise<SyncStats> {
         }
       }
 
-      const totalPages = Math.ceil(response.body.totalCount / numOfRows);
+      const totalPages = Math.ceil((response?.body?.totalCount || 0) / numOfRows);
       hasMoreData = pageNo < totalPages;
       pageNo++;
     }

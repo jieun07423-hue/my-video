@@ -68,7 +68,8 @@ export async function speechToTextWithWhisper(audioBuffer: Buffer): Promise<Voic
     const formData = new FormData();
     
     // Buffer를 Blob으로 변환
-    const audioBlob = new Blob([audioBuffer], { type: 'audio/ogg' });
+    const arrayBuffer = audioBuffer.buffer.slice(audioBuffer.byteOffset, audioBuffer.byteOffset + audioBuffer.byteLength);
+    const audioBlob = new Blob([arrayBuffer as ArrayBuffer], { type: 'audio/ogg' });
     const audioFile = new File([audioBlob], 'voice.ogg', { type: 'audio/ogg' });
     formData.append('file', audioFile);
     formData.append('model', 'whisper-1');
@@ -81,7 +82,7 @@ export async function speechToTextWithWhisper(audioBuffer: Buffer): Promise<Voic
       {
         headers: {
           'Authorization': `Bearer ${OPENAI_API_KEY}`,
-          ...formData.getHeaders(),
+          'Content-Type': 'multipart/form-data',
         },
       }
     );
@@ -208,7 +209,8 @@ export async function sendVoiceToTelegram(
 
   try {
     const formData = new FormData();
-    const audioBlob = new Blob([audioBuffer], { type: 'audio/ogg' });
+    const arrayBuffer = audioBuffer.buffer.slice(audioBuffer.byteOffset, audioBuffer.byteOffset + audioBuffer.byteLength);
+    const audioBlob = new Blob([arrayBuffer as ArrayBuffer], { type: 'audio/ogg' });
     const audioFile = new File([audioBlob], 'voice.ogg', { type: 'audio/ogg' });
     formData.append('chat_id', String(chatId));
     formData.append('voice', audioFile);
@@ -217,7 +219,7 @@ export async function sendVoiceToTelegram(
     }
 
     await axios.post(`${BASE_URL}/sendVoice`, formData, {
-      headers: formData.getHeaders(),
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
 
     notificationLogger.info({ chatId }, 'Telegram 음성 전송 완료');

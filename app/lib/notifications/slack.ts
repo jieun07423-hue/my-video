@@ -214,7 +214,7 @@ export async function notifyN8nWorkflow(data: Record<string, unknown>) {
     
     notificationLogger.info({ url: N8N_WEBHOOK_URL }, 'n8n 워크플로우 알림 전송 성공');
   } catch (error) {
-    notificationLogger.error({ error: error.message }, 'n8n 워크플로우 알림 전송 실패');
+    notificationLogger.error({ error: error instanceof Error ? error.message : String(error) }, 'n8n 워크플로우 알림 전송 실패');
   }
 }
 

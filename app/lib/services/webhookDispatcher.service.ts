@@ -297,7 +297,7 @@ async function attemptDeliveryWithLogging(
         data: {
           endpointId,
           eventType,
-          payload,
+          payload: payload as never,
           status,
           responseCode,
           responseBody,

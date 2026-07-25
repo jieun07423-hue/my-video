@@ -11,6 +11,7 @@ export interface ExecutiveReport {
   sections: ReportSection[];
   recommendations: ExecutiveRecommendation[];
   score: number;
+  grade?: string;
 }
 
 export interface ReportSummary {

@@ -106,7 +106,7 @@ export class OpenClawClient {
     } catch (error) {
       logger.error({
         error: error instanceof Error ? error.message : String(error),
-        baseUrl: this.baseUrl,
+        baseUrl: this.config.ollamaUrl,
         model: this.config.model,
       }, 'OpenClaw inference error');
       throw error;

@@ -359,3 +359,17 @@ export async function syncFromPublicDataPortal(
     };
   }
 }
+
+// In-memory sync lock for preventing concurrent syncs
+let syncLockedAt: Date | null = null;
+let syncInProgress = false;
+
+export function getSyncLockStatus(): { isLocked: boolean; lockedAt: Date | null } {
+  return { isLocked: syncInProgress, lockedAt: syncLockedAt };
+}
+
+/** @internal Called by sync functions to acquire/release the lock */
+export function setSyncLock(locked: boolean): void {
+  syncInProgress = locked;
+  syncLockedAt = locked ? new Date() : null;
+}
