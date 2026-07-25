@@ -13,9 +13,23 @@ export interface SyncStateUpdate {
 
 export class SyncStateRepository {
   async getSyncState(dataSource: string = 'public-data-portal') {
-    return await db.syncState.findUnique({
+    const result = await db.syncState.findUnique({
       where: { dataSource },
-    }) || { id: '1', dataSource, syncStatus: 'idle' };
+    });
+    if (result) return result;
+    return {
+      id: '1',
+      dataSource,
+      syncStatus: 'idle' as const,
+      lastSyncedAt: null,
+      lastBusinessId: null,
+      syncCount: 0,
+      totalSynced: 0,
+      newRecordsCount: 0,
+      errorMessage: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
   }
 
   async createSyncState(dataSource: string = 'public-data-portal') {

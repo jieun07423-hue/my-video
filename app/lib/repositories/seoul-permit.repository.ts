@@ -72,7 +72,7 @@ export class SeoulPermitRepository {
         });
         inserted++;
       } catch (error) {
-        dbLogger.error({ error: error.message, manageNo: item.manageNo }, 'Failed to upsert permit');
+        dbLogger.error({ error: error instanceof Error ? error.message : String(error), manageNo: item.manageNo }, 'Failed to upsert permit');
       }
     }
 
@@ -114,7 +114,7 @@ export class SeoulPermitRepository {
   }
 
   async countByServiceCode(): Promise<any[]> {
-    return db.seoulPermit.groupBy({
+    return (db.seoulPermit as any).groupBy({
       by: ['serviceCode', 'trdStateNm'],
       _count: true,
     });

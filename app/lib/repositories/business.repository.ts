@@ -125,12 +125,16 @@ export class BusinessRepository {
     const active = await db.business.count({ where: { status: 'active' } });
     const inactive = await db.business.count({ where: { status: 'inactive' } });
     const dissolved = await db.business.count({ where: { status: 'dissolved' } });
+    const newToday = await db.business.count({ where: { recordStatus: 'new' } });
+    const newRecords = await db.business.count({ where: { recordStatus: 'synced' } });
     
     return {
       total,
       active,
       inactive,
       dissolved,
+      newToday,
+      newRecords,
     };
   }
 

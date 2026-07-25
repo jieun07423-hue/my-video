@@ -24,6 +24,9 @@ export interface DbClient {
   webhookDeliveryLog: PrismaClient['webhookDeliveryLog'];
   businessClaimRequest: PrismaClient['businessClaimRequest'];
   systemSetting: PrismaClient['systemSetting'];
+  qrCode: PrismaClient['qrCode'];
+  menu: PrismaClient['menu'];
+  store: PrismaClient['store'];
   $connect: () => Promise<void>;
   $disconnect: () => Promise<void>;
   $transaction: <T>(fn: (tx: Omit<DbClient, '$connect' | '$disconnect' | '$transaction'>) => Promise<T>, options?: { timeout?: number }) => Promise<T>;

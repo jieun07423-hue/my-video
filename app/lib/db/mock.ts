@@ -188,6 +188,7 @@ const mockNote = {
   create: async (args: { data: Record<string, unknown> }) => {
     const note: MockNoteRow = {
       id: `mock-note-${Date.now()}`,
+      businessId: String(args.data.businessId || 'mock-biz'),
       ...args.data,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -276,7 +277,8 @@ const mockOrderItem = {
     return { count: args.data.length };
   },
   findMany: async (args?: { where?: { orderId?: string } }) => {
-    if (args?.where?.orderId) return mockOrderItemData.filter((i) => i.orderId === args.where.orderId);
+    const where = args?.where;
+    if (where?.orderId) return mockOrderItemData.filter((i) => i.orderId === where.orderId);
     return mockOrderItemData;
   },
 };
@@ -289,8 +291,9 @@ const mockStockHistory = {
   },
   findMany: async (args?: { where?: { productId?: string; orderId?: string } }) => {
     let result = [...mockStockHistoryData];
-    if (args?.where?.productId) result = result.filter((h) => h.productId === args.where.productId);
-    if (args?.where?.orderId) result = result.filter((h) => h.orderId === args.where.orderId);
+    const where = args?.where;
+    if (where?.productId) result = result.filter((h) => h.productId === where.productId);
+    if (where?.orderId) result = result.filter((h) => h.orderId === where.orderId);
     return result;
   },
 };
@@ -463,6 +466,82 @@ const mockSystemSetting = {
 };
 
 // ---------------------------------------------------------------------------
+// QR Code, Menu, Store mock delegates
+// ---------------------------------------------------------------------------
+
+const mockQrCodeData: Array<Record<string, unknown>> = [];
+
+const mockQrCode = {
+  create: async (args: { data: Record<string, unknown> }) => {
+    const qr = { id: `mock-qr-${Date.now()}`, ...args.data, createdAt: new Date() };
+    mockQrCodeData.push(qr);
+    return qr;
+  },
+  findUnique: async (args: { where: { id?: string } }) => mockQrCodeData.find((q) => q.id === args.where.id) || null,
+  findMany: async (_args?: Record<string, unknown>) => mockQrCodeData,
+  update: async (args: { where: { id: string }; data: Record<string, unknown> }) => {
+    const idx = mockQrCodeData.findIndex((q) => q.id === args.where.id);
+    if (idx !== -1) {
+      mockQrCodeData[idx] = { ...mockQrCodeData[idx], ...args.data };
+      return mockQrCodeData[idx];
+    }
+    return null;
+  },
+  count: async (_args?: Record<string, unknown>) => mockQrCodeData.length,
+  delete: async (args: { where: { id: string } }) => {
+    const idx = mockQrCodeData.findIndex((q) => q.id === args.where.id);
+    if (idx !== -1) return mockQrCodeData.splice(idx, 1)[0];
+    return null;
+  },
+};
+
+const mockMenuData: Array<Record<string, unknown>> = [];
+
+const mockMenu = {
+  create: async (args: { data: Record<string, unknown> }) => {
+    const m = { id: `mock-menu-${Date.now()}`, ...args.data, createdAt: new Date(), updatedAt: new Date() };
+    mockMenuData.push(m);
+    return m;
+  },
+  findMany: async (_args?: Record<string, unknown>) => mockMenuData,
+  findUnique: async (args: { where: { id?: string } }) => mockMenuData.find((m) => m.id === args.where.id) || null,
+  update: async (args: { where: { id: string }; data: Record<string, unknown> }) => {
+    const idx = mockMenuData.findIndex((m) => m.id === args.where.id);
+    if (idx !== -1) {
+      mockMenuData[idx] = { ...mockMenuData[idx], ...args.data };
+      return mockMenuData[idx];
+    }
+    return null;
+  },
+  count: async (_args?: Record<string, unknown>) => mockMenuData.length,
+};
+
+const mockStoreData: Array<Record<string, unknown>> = [];
+
+const mockStore = {
+  create: async (args: { data: Record<string, unknown> }) => {
+    const s = { id: `mock-store-${Date.now()}`, ...args.data, createdAt: new Date(), updatedAt: new Date() };
+    mockStoreData.push(s);
+    return s;
+  },
+  findMany: async (_args?: Record<string, unknown>) => mockStoreData,
+  findUnique: async (args: { where: { id?: string; slug?: string } }) => {
+    if (args.where.id) return mockStoreData.find((s) => s.id === args.where.id) || null;
+    if (args.where.slug) return mockStoreData.find((s) => s.slug === args.where.slug) || null;
+    return null;
+  },
+  update: async (args: { where: { id: string }; data: Record<string, unknown> }) => {
+    const idx = mockStoreData.findIndex((s) => s.id === args.where.id);
+    if (idx !== -1) {
+      mockStoreData[idx] = { ...mockStoreData[idx], ...args.data };
+      return mockStoreData[idx];
+    }
+    return null;
+  },
+  count: async (_args?: Record<string, unknown>) => mockStoreData.length,
+};
+
+// ---------------------------------------------------------------------------
 // Mock DbClient 생성 / 리셋
 // ---------------------------------------------------------------------------
 
@@ -488,6 +567,9 @@ export function createMockDb(): DbClient {
     webhookDeliveryLog: mockWebhookDeliveryLog as unknown as DbClient['webhookDeliveryLog'],
     businessClaimRequest: mockBusinessClaimRequest as unknown as DbClient['businessClaimRequest'],
     systemSetting: mockSystemSetting as unknown as DbClient['systemSetting'],
+    qrCode: mockQrCode as unknown as DbClient['qrCode'],
+    menu: mockMenu as unknown as DbClient['menu'],
+    store: mockStore as unknown as DbClient['store'],
     $connect: async () => {
       dbLogger.info('Mock 데이터베이스 모드 사용 중');
     },
@@ -519,6 +601,9 @@ export function resetMockData(): void {
   mockWebhookDeliveryLogData.length = 0;
   mockClaimRequestData.length = 0;
   mockSystemSettingData.length = 0;
+  mockQrCodeData.length = 0;
+  mockMenuData.length = 0;
+  mockStoreData.length = 0;
   mockProductIdCounter = 1;
   mockOrderIdCounter = 1;
   mockEndpointIdCounter = 1;

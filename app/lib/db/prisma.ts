@@ -38,6 +38,10 @@ export function createPrismaClient(): DbClient {
     webhookEndpoint: prismaClient.webhookEndpoint,
     webhookDeliveryLog: prismaClient.webhookDeliveryLog,
     businessClaimRequest: prismaClient.businessClaimRequest,
+    systemSetting: prismaClient.systemSetting,
+    qrCode: prismaClient.qrCode,
+    menu: prismaClient.menu,
+    store: prismaClient.store,
     $connect: () => prismaClient!.$connect(),
     $disconnect: () => prismaClient!.$disconnect(),
     $transaction: <T>(fn: (tx: any) => Promise<T>, options?: { timeout?: number }) => {

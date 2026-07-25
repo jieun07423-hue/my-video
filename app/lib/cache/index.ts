@@ -14,6 +14,7 @@ interface CacheAdapter {
   keys(pattern: string): Promise<string[]>;
   exists(key: string): Promise<number>;
   ping(): Promise<string>;
+  info(): Promise<CacheInfo>;
   quit(): Promise<string>;
 }
 
@@ -96,7 +97,7 @@ class MemoryCacheAdapter implements CacheAdapter {
 // ---------------------------------------------------------------------------
 // CacheManager — 단일 진입점
 // ---------------------------------------------------------------------------
-export class CacheManager {
+class CacheManager {
   private config: CacheConfig;
   private adapter: CacheAdapter | null = null;
   private connected = false;
@@ -116,10 +117,10 @@ export class CacheManager {
     if (this.connected) return;
 
     try {
-      const Redis = await importRedis();
-      if (Redis) {
+      const ioredisModule = await importRedis();
+      if (ioredisModule) {
         webLogger.info('Redis 연결 시도 중...');
-        const client = new Redis({
+        const client = new ioredisModule.default({
           host: this.config.host,
           port: this.config.port,
           password: this.config.password,
@@ -243,7 +244,7 @@ export class CacheManager {
   }
 
   createRepositoryWrapper<T>(repository: T): CachedRepository<T> {
-    return new CachedRepository(repository, this);
+    return new CachedRepository<T>(repository, this);
   }
 }
 
@@ -276,6 +277,10 @@ function createRedisAdapter(client: IORedisClient): CacheAdapter {
     keys: (pattern: string) => client.keys(pattern),
     exists: (key: string) => client.exists(key),
     ping: () => client.ping(),
+    info: async (): Promise<CacheInfo> => {
+      const raw = await client.info();
+      return { type: 'redis', keys: Object.keys(raw).length };
+    },
     quit: () => client.quit(),
   };
 }
@@ -291,7 +296,7 @@ async function importRedis(): Promise<typeof import('ioredis') | null> {
 // ---------------------------------------------------------------------------
 // Repository 캐싱 래퍼
 // ---------------------------------------------------------------------------
-export class CachedRepository<T extends Record<string, unknown>> {
+class CachedRepository<T> {
   private repository: T;
   private cache: CacheManager;
   private prefixes = {
@@ -343,18 +348,9 @@ export class CachedRepository<T extends Record<string, unknown>> {
 // ---------------------------------------------------------------------------
 // 전역 싱글턴
 // ---------------------------------------------------------------------------
-export const globalCacheManager = new CacheManager();
-
-export async function initializeCache(): Promise<CacheManager> {
-  await globalCacheManager.connect();
-  return globalCacheManager;
-}
-
-// 전역 캐시 매니저 인스턴스
 const globalCacheManager = new CacheManager();
 
-// 초기화 함수
-async function initializeCache() {
+async function initializeCache(): Promise<CacheManager> {
   await globalCacheManager.connect();
   return globalCacheManager;
 }
