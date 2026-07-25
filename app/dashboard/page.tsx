@@ -4,21 +4,15 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { StatCard } from '@/components/ui/StatCard';
-import { CompletenessScoreCard } from '@/components/ui/CompletenessScoreCard';
+import TrendChart from '@/components/dashboard/TrendChart';
+import IndustryChart from '@/components/dashboard/IndustryChart';
 import {
   BarChart3,
   RefreshCw,
   Building2,
-  CheckCircle,
-  XCircle,
-  PauseCircle,
-  Clock,
   AlertCircle,
   TrendingUp,
   ExternalLink,
-  Shield,
-  AlertTriangle,
-  CheckSquare,
 } from 'lucide-react';
 
 interface BusinessStats {
@@ -36,6 +30,14 @@ interface SyncState {
   syncCount: number;
   totalSynced: number;
   newRecordsCount: number;
+}
+
+interface TrendData {
+  weeklyVisitors: { date: string; value: number; label: string }[];
+  weeklySignups: { date: string; value: number; label: string }[];
+  campaignTrends: { date: string; value: number; label: string }[];
+  industryDistribution: { name: string; count: number; percentage: number }[];
+  monthlyRevenue: { date: string; value: number; label: string }[];
 }
 
 interface AdStats {
@@ -72,6 +74,7 @@ export default function DashboardPage() {
   const [businessStats, setBusinessStats] = useState<BusinessStats | null>(null);
   const [syncState, setSyncState] = useState<SyncState | null>(null);
   const [adStats, setAdStats] = useState<AdStats | null>(null);
+  const [trends, setTrends] = useState<TrendData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,10 +82,11 @@ export default function DashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const [statsRes, syncRes, adRes] = await Promise.all([
+      const [statsRes, syncRes, adRes, trendsRes] = await Promise.all([
         fetch('/api/dashboard/stats'),
         fetch('/api/sync/status'),
         fetch('/api/ad/stats'),
+        fetch('/api/dashboard/trends'),
       ]);
 
       if (!statsRes.ok) throw new Error('통계를 불러오는데 실패했습니다.');
@@ -98,6 +102,11 @@ export default function DashboardPage() {
       if (adRes.ok) {
         const adData = await adRes.json();
         setAdStats(adData);
+      }
+
+      if (trendsRes.ok) {
+        const trendsData = await trendsRes.json();
+        setTrends(trendsData.data);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '알 수 없는 오류');
@@ -169,6 +178,26 @@ export default function DashboardPage() {
                 <StatCard title="폐업" value={businessStats?.dissolved || 0} color="red" icon="❌" delay={400} />
               </div>
             </div>
+
+            {trends && (
+              <div className="mb-8">
+                <h2 className="mb-4 text-lg font-semibold text-gray-900">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 size={20} className="text-indigo-600" />
+                    트렌드 분석
+                  </div>
+                </h2>
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <TrendChart title="주간 활동 트렌드" data={trends.weeklyVisitors} color="#6366f1" />
+                  <TrendChart title="주간 가입 트렌드" data={trends.weeklySignups} color="#22c55e" />
+                  <TrendChart title="광고 캠페인 추이" data={trends.campaignTrends} color="#a855f7" />
+                  <TrendChart title="월별 매출 추이" data={trends.monthlyRevenue} format="currency" color="#f97316" />
+                </div>
+                <div className="mt-6">
+                  <IndustryChart data={trends.industryDistribution} />
+                </div>
+              </div>
+            )}
 
             {/* 동기화 상태 */}
             <div className="mb-8 grid gap-6 lg:grid-cols-2">
@@ -259,68 +288,6 @@ export default function DashboardPage() {
                     className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-800"
                   >
                     광고 생성 페이지로 이동
-                    <ExternalLink size={14} />
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* 데이터 품질 상태 */}
-            <div className="mb-8">
-              <h2 className="mb-4 text-lg font-semibold text-gray-900">
-                <div className="flex items-center gap-2">
-                  <Shield size={20} className="text-indigo-600" />
-                  데이터 품질 현황
-                </div>
-              </h2>
-              <div className="grid gap-6 lg:grid-cols-3">
-                <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
-                  <div className="mb-4 flex items-center gap-2">
-                    <CheckSquare size={18} className="text-green-600" />
-                    <h3 className="font-semibold text-gray-900">사업자등록번호 검증</h3>
-                  </div>
-                  <p className="mb-4 text-sm text-gray-600">
-                    공공데이터 API를 활용한 실시간 사업자등록번호 검증
-                  </p>
-                  <Link
-                    href="/api/data-quality/validate?bizesId=1234567890"
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-800"
-                  >
-                    검증 테스트
-                    <ExternalLink size={14} />
-                  </Link>
-                </div>
-
-                <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
-                  <div className="mb-4 flex items-center gap-2">
-                    <BarChart3 size={18} className="text-blue-600" />
-                    <h3 className="font-semibold text-gray-900">데이터 완성도</h3>
-                  </div>
-                  <p className="mb-4 text-sm text-gray-600">
-                    필드별 가중치 기반 데이터 완성도 점수 시스템
-                  </p>
-                  <Link
-                    href="/api/data-quality/completeness?report=true"
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-800"
-                  >
-                    리포트 보기
-                    <ExternalLink size={14} />
-                  </Link>
-                </div>
-
-                <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
-                  <div className="mb-4 flex items-center gap-2">
-                    <AlertTriangle size={18} className="text-amber-600" />
-                    <h3 className="font-semibold text-gray-900">중복 탐지</h3>
-                  </div>
-                  <p className="mb-4 text-sm text-gray-600">
-                    이름+주소 유사도 기반 스마트 중복 데이터 탐지
-                  </p>
-                  <Link
-                    href="/api/data-quality/duplicates"
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-800"
-                  >
-                    중복 검사
                     <ExternalLink size={14} />
                   </Link>
                 </div>

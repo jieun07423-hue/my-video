@@ -123,7 +123,7 @@ function AdminDashboard() {
       <DynamicStatCard title="오늘 신규" value={stats?.newToday || 0} icon="📅" />
       
       <DynamicSyncStatusCard syncStatus={{
-        syncStatus: syncState?.syncStatus || 'idle',
+        syncStatus: (syncState?.syncStatus || 'idle') as 'idle' | 'failed' | 'success' | 'running',
         lastSyncedAt: syncState?.lastSyncedAt || null,
         errorMessage: syncState?.errorMessage || null
       }} />

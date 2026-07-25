@@ -33,19 +33,41 @@ interface SearchParams {
   limit?: number;
 }
 
-interface Business {
+interface BusinessItem {
   id: string;
   bizesId: string;
   name: string;
   roadNameAddress: string | null;
   lotNumberAddress: string | null;
+  phone: string | null;
+  businessCode: string | null;
   businessName: string | null;
-  status: string;
-  recordStatus: string;
+  indsLclsNm: string | null;
+  indsMclsNm: string | null;
+  indsSclsNm: string | null;
+  status: 'pending' | 'active' | 'inactive' | 'dissolved' | 'pending_renewal';
+  recordStatus: 'new' | 'synced' | 'verified';
   createdAt: string;
 }
 
-function BusinessTable({ businesses, isLoading }: { businesses: Business[]; isLoading?: boolean }) {
+interface PaginatedBusinesses {
+  items: BusinessItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+interface BusinessStatsData {
+  total: number;
+  active: number;
+  inactive: number;
+  dissolved: number;
+  newToday: number;
+  newRecords: number;
+}
+
+function BusinessTable({ businesses, isLoading }: { businesses: BusinessItem[]; isLoading?: boolean }) {
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -210,7 +232,7 @@ export default function BusinessesPage() {
     setIsRefreshing(false);
   };
 
-  const businesses = businessesData?.items || [];
+  const businesses = (businessesData?.items || []) as unknown as BusinessItem[];
   const stats = statsData || {
     total: 0,
     newToday: 0,

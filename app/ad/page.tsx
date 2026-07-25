@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import Link from 'next/link';
 import Navbar from '../components/Navbar';
-import { Sparkles, Zap, Loader2, ChevronDown, ChevronUp, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Sparkles, Zap, Loader2, ChevronDown, ChevronUp, CheckCircle, AlertCircle, RefreshCw, FlaskConical, BarChart3 } from 'lucide-react';
+import AbTestPanel from '../components/ad/AbTestPanel';
 
 interface AdGenerateResult {
   campaign: {
@@ -45,6 +47,9 @@ export default function AdPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAllCopies, setShowAllCopies] = useState(false);
+  const [abTestMode, setAbTestMode] = useState(false);
+  const [abToneB, setAbToneB] = useState('친근/따뜻');
+  const [abWinner, setAbWinner] = useState<string[] | null>(null);
 
   const handleGenerate = useCallback(async () => {
     if (!industry.trim() || !location.trim()) {
@@ -211,23 +216,73 @@ export default function AdPage() {
             </div>
           </div>
 
-          <button
-            onClick={handleGenerate}
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading ? (
-              <>
-                <Loader2 size={20} className="animate-spin" />
-                AI가 광고를 생성 중입니다...
-              </>
-            ) : (
-              <>
-                <Zap size={20} />
-                광고 카피 생성하기
-              </>
-            )}
-          </button>
+          <div className="mb-4 flex items-center gap-3">
+            <button
+              onClick={() => setAbTestMode(false)}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                !abTestMode
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white/5 text-gray-400 border border-gray-700'
+              }`}
+            >
+              <Zap size={14} /> 단일 생성
+            </button>
+            <button
+              onClick={() => setAbTestMode(true)}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                abTestMode
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-white/5 text-gray-400 border border-gray-700'
+              }`}
+            >
+              <FlaskConical size={14} /> AB 테스트
+            </button>
+            <Link
+              href="/ad/performance"
+              className="flex items-center gap-1.5 rounded-lg border border-gray-700 bg-white/5 px-3 py-1.5 text-xs font-medium text-gray-400 transition-all hover:text-indigo-400"
+            >
+              <BarChart3 size={14} /> 성과
+            </Link>
+          </div>
+
+          {abTestMode ? (
+            <div className="mb-6">
+              <label className="mb-3 block text-sm font-medium text-white">Variant B 톤 선택</label>
+              <div className="flex flex-wrap gap-2">
+                {['친근/따뜻', '세련/고급', '유머/재치', '긴급/할인'].filter(t => t !== tone).map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => setAbToneB(option)}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                      abToneB === option
+                        ? 'bg-amber-500 text-white border border-amber-500'
+                        : 'bg-white/5 text-gray-400 border border-gray-700'
+                    }`}
+                  >
+                    Variant B: {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={handleGenerate}
+              disabled={loading}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={20} className="animate-spin" />
+                  AI가 광고를 생성 중입니다...
+                </>
+              ) : (
+                <>
+                  <Zap size={20} />
+                  광고 카피 생성하기
+                </>
+              )}
+            </button>
+          )}
 
           {error && (
             <div className="mt-4 flex items-start gap-2 rounded-xl bg-rose-500/10 border border-rose-500/30 p-4">
@@ -237,7 +292,44 @@ export default function AdPage() {
           )}
         </div>
 
-        {result && (
+        {abTestMode && result && (
+          <div className="mb-8">
+            <AbTestPanel
+              industry={industry}
+              location={location}
+              target={target}
+              goal={goal}
+              strengths={strengths}
+              keywords={keywords.split(',').map(k => k.trim()).filter(Boolean)}
+              toneA={tone}
+              toneB={abToneB}
+              onSelectWinner={(_variant, copies) => setAbWinner(copies)}
+            />
+            {abWinner && (
+              <div className="mt-6 rounded-2xl border border-green-500/30 bg-green-500/5 p-6">
+                <div className="mb-4 flex items-center gap-2">
+                  <CheckCircle size={20} className="text-green-500" />
+                  <h2 className="text-lg font-bold text-white">선택된 광고 카피</h2>
+                </div>
+                <div className="grid gap-3">
+                  {abWinner.map((copy, i) => (
+                    <div key={i} className="rounded-xl bg-green-500/10 border border-green-500/20 p-4">
+                      <p className="text-base leading-relaxed text-white">{copy}</p>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => { setResult(null); setAbWinner(null); setShowAllCopies(false); }}
+                  className="mt-4 flex items-center gap-1.5 rounded-lg bg-green-500/10 px-3 py-1.5 text-xs font-medium text-green-500"
+                >
+                  <RefreshCw size={14} /> 새 테스트
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {result && !abTestMode && (
           <div className="space-y-6">
             <div className="rounded-2xl bg-blue-500/8 border border-blue-500/30 p-6">
               <div className="mb-4 flex items-center gap-2">

@@ -8,6 +8,19 @@ jest.mock('next/link', () => {
   };
 });
 
+class MockEventSource {
+  onmessage: ((event: MessageEvent) => void) | null = null;
+  onerror: ((event: Event) => void) | null = null;
+  readyState = 1;
+  close() {}
+  constructor(_url: string) {}
+}
+
+Object.defineProperty(global, 'EventSource', {
+  writable: true,
+  value: MockEventSource,
+});
+
 describe('Navbar', () => {
   it('로고와 주요 네비게이션 링크가 렌더링되어야 한다', () => {
     render(<Navbar />);
