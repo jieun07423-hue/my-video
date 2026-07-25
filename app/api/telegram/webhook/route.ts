@@ -136,8 +136,8 @@ async function handleCallbackQuery(callbackQuery: { id: string; from?: { id: num
 
   if (data.startsWith('industry_')) {
     const industry = data.replace('industry_', '');
-    userSessionService.updateContext(chatId, { industry });
-    userSessionService.updateState(chatId, { mode: 'ad_location', step: 1 });
+    userSessionService.updateContext(String(chatId), { industry });
+    userSessionService.updateState(String(chatId), { mode: 'ad_location', step: 1 });
     
     await sendTelegramMessage(chatId, `🏢 업종: *${industry}*\n\n지역을 입력해주세요.\n예: 강남, 잠실, 홍대`);
     await answerCallbackQuery(callbackId);
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
     const configuredSecret = process.env.TELEGRAM_SECRET_TOKEN;
     
     if (configuredSecret && configuredSecret.length > 0) {
-      if (!verifyTelegramSecretToken(secretToken)) {
+      if (!verifyTelegramSecretToken(secretToken ?? undefined)) {
         notificationLogger.warn('잘못된 Telegram secret token');
         return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
       }
@@ -386,6 +386,7 @@ if (text === '/start') {
           industry,
           location,
           target,
+          keywords: [],
           telegramChatId: String(chatId),
         });
 
@@ -395,6 +396,7 @@ if (text === '/start') {
           industry,
           location,
           target,
+          keywords: [],
         });
 
         const allCopies = [

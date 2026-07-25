@@ -16,7 +16,7 @@ export async function DELETE(
     noteLogger.info({ noteId: params.id }, '노트 영구 삭제 완료');
     return NextResponse.json({ message: '영구 삭제 성공' });
   } catch (error) {
-    noteLogger.error({ error: error.message, noteId: params.id }, '노트 영구 삭제 실패');
+    noteLogger.error({ error: error instanceof Error ? error.message : String(error), noteId: params.id }, '노트 영구 삭제 실패');
     return NextResponse.json({ error: '영구 삭제 실패' }, { status: 500 });
   }
 }

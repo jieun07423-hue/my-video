@@ -15,7 +15,7 @@ export async function GET(
 
     return NextResponse.json(item);
   } catch (error) {
-    syncLogger.error({ error: error.message, id: params.id }, 'Failed to fetch Seoul permit');
+    syncLogger.error({ error: error instanceof Error ? error.message : String(error), id: params.id }, 'Failed to fetch Seoul permit');
     return NextResponse.json({ error: '조회 실패' }, { status: 500 });
   }
 }

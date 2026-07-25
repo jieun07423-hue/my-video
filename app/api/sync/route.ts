@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSyncLockStatus } from '@/lib/services/public-data-portal.service';
 import { syncStateRepository } from '@/lib/repositories/sync-state.repository';
 import { apiLogger } from '@/lib/logger';
 import { addSyncJob } from '@/lib/queues/sync.queue';
@@ -59,7 +58,7 @@ export async function GET() {
   const syncState = await syncStateRepository.getSyncState();
 
   return NextResponse.json({
-    isLocked: syncState?.status === 'running',
+    isLocked: syncState.syncStatus === 'running',
     syncState,
   });
 }

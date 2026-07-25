@@ -19,31 +19,31 @@ export async function POST(request: NextRequest) {
     }
 
     const serviceData = result[serviceCode];
-    const items = serviceData.row || [];
+    const items: any[] = serviceData.row || [];
     const totalCount = serviceData.list_total_count || 0;
 
     const permitData = items.map((item: any) => ({
-      manageNo: item.MGTNO,
-      bplcNm: item.BPLCNM,
-      bpNm: item.BPNM,
-      bizcnd: item.BIZCND,
-      locplcd: item.LOCPLCD,
-      rdnWhladdr: item.RDNWHLADDR,
-      siteTel: item.SITETEL,
-      apvPermYmd: item.APVPERMYMD,
-      apvCancelYmd: item.APVCANCELYMD,
-      trdStateGbn: item.TRDSTATEGBN,
-      trdStateNm: item.TRDSTATENM,
-      dtlStateGbn: item.DTLSTATEGBN,
-      dtlStateNm: item.DTLSTATENM,
-      dcbyYmd: item.DCBYMD,
-      sitePostNo: item.SITEPOSTNO,
-      xCoord: item.X ? parseFloat(item.X.trim()) : null,
-      yCoord: item.Y ? parseFloat(item.Y.trim()) : null,
+      manageNo: String(item.MGTNO || ''),
+      bplcNm: String(item.BPLCNM || ''),
+      bpNm: String(item.BPNM || ''),
+      bizcnd: String(item.BIZCND || ''),
+      locplcd: String(item.LOCPLCD || ''),
+      rdnWhladdr: String(item.RDNWHLADDR || ''),
+      siteTel: String(item.SITETEL || ''),
+      apvPermYmd: String(item.APVPERMYMD || ''),
+      apvCancelYmd: String(item.APVCANCELYMD || ''),
+      trdStateGbn: String(item.TRDSTATEGBN || ''),
+      trdStateNm: String(item.TRDSTATENM || ''),
+      dtlStateGbn: String(item.DTLSTATEGBN || ''),
+      dtlStateNm: String(item.DTLSTATENM || ''),
+      dcbyYmd: String(item.DCBYMD || ''),
+      sitePostNo: String(item.SITEPOSTNO || ''),
+      xCoord: item.X ? parseFloat(String(item.X).trim()) : null,
+      yCoord: item.Y ? parseFloat(String(item.Y).trim()) : null,
       serviceCode,
     }));
 
-    const inserted = await seoulPermitRepository.upsertMany(permitData);
+    const inserted = await seoulPermitRepository.upsertMany(permitData as any);
 
     syncLogger.info({ 
       serviceCode, 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       inserted,
     });
   } catch (error) {
-    syncLogger.error({ error: error.message }, 'Seoul permit sync failed');
+    syncLogger.error({ error: error instanceof Error ? error.message : String(error) }, 'Seoul permit sync failed');
     return NextResponse.json({ error: '동기화 실패' }, { status: 500 });
   }
 }
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
       stats,
     });
   } catch (error) {
-    syncLogger.error({ error: error.message }, 'Failed to fetch Seoul permits');
+    syncLogger.error({ error: error instanceof Error ? error.message : String(error) }, 'Failed to fetch Seoul permits');
     return NextResponse.json({ error: '조회 실패' }, { status: 500 });
   }
 }

@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     noteLogger.info({ count: result.items.length }, '삭제된 노트 조회 완료');
     return NextResponse.json(result);
   } catch (error) {
-    noteLogger.error({ error: error.message }, '삭제된 노트 조회 실패');
+    noteLogger.error({ error: error instanceof Error ? error.message : String(error) }, '삭제된 노트 조회 실패');
     return NextResponse.json({ error: '조회 실패' }, { status: 500 });
   }
 }

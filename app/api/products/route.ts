@@ -34,21 +34,22 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { name, sku, description, price, stockQuantity, lowStockThreshold, category } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { name, sku, description, price, stockQuantity, lowStockThreshold, category } = body as { name?: string; sku?: string; description?: string; price?: number; stockQuantity?: number | null; lowStockThreshold?: number; category?: string };
 
     if (!name || !sku || price === undefined) {
       return createBadRequestResponse('name, sku, price는 필수 항목입니다');
     }
 
     const product = await productRepository.create({
-      name,
-      sku,
-      description: description || null,
-      price,
-      stockQuantity: stockQuantity ?? null,
-      lowStockThreshold: lowStockThreshold ?? 5,
-      category: category || null,
+      storeId: String(body.storeId || 'default'),
+      name: String(name),
+      sku: String(sku),
+      description: description ? String(description) : undefined,
+      price: Number(price),
+      stockQuantity: stockQuantity != null ? Number(stockQuantity) : null,
+      lowStockThreshold: lowStockThreshold != null ? Number(lowStockThreshold) : 5,
+      category: category ? String(category) : undefined,
     });
 
     apiLogger.info({ productId: product.id, sku }, 'Product created via Repository');

@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       }));
 
       const metrics = await collectMetrics(businesses);
-      const trends = [analyzeTrend([])];
+      const trends = [analyzeTrend([], 'executive')];
       const report = generateExecutiveReport(metrics, trends, periodDays);
 
       if (format === 'markdown') {
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       }));
 
       const metrics = await collectMetrics(businesses);
-      const trends = [analyzeTrend([])];
+      const trends = [analyzeTrend([], 'dashboard')];
       const dashboard = generateDashboard(metrics, trends);
 
       apiLogger.info({
