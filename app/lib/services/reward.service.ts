@@ -12,7 +12,7 @@ const stampStore = new Map<string, CustomerStampRecord>();
 export class RewardService {
   async addStamp(phone: string, storeId: string, count: number = 1): Promise<{ stamps: number; couponIssued: boolean; couponCode?: string }> {
     const key = `${storeId}:${phone}`;
-    let record = stampStore.get(key) || { phone, storeId, stamps: 0, coupons: [] };
+    const record = stampStore.get(key) || { phone, storeId, stamps: 0, coupons: [] };
 
     record.stamps += count;
     let couponIssued = false;

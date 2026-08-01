@@ -5,6 +5,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --config eslint.config.mjs --ext .js,.jsx,.ts,.tsx . --fix",
     "lint:ci": "npm run lint --silent --max-warnings=0",
+    "format": "npm run lint:fix",
     "typecheck": "tsc --noEmit",
     "prepare": "husky install || true",
     "quality": "node scripts/quality-runner.js",
