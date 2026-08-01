@@ -23,7 +23,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          NODE_ENV: ${{ secrets.NODE_ENV }}
+          NODE_ENV: 'development'
           
       - name: 개발 서버 테스트
         run: |
@@ -32,4 +32,4 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          NODE_ENV: ${{ secrets.NODE_ENV }}
+          NODE_ENV: 'development'
