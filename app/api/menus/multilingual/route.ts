@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiLogger } from '@/lib/logger';
 
+export const dynamic = 'force-dynamic';
+
 const translations: Record<string, Record<string, string>> = {
   en: {
     signatureSet: 'Signature Set Menu',

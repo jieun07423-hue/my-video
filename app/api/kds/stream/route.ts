@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server';
 import { apiLogger } from '@/lib/logger';
 import { kdsEventEmitter } from '@/lib/events/kds.event';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   const encoder = new TextEncoder();
   const { searchParams } = new URL(request.url);
