@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const businesses = Array.isArray(body) ? body : [body];
 
     const result = await businessRepository.createMany(businesses);
-    apiLogger.info({ created: result.count }, '소상공인 생성 성공');
+    apiLogger.info({ created: result.createdCount }, '소상공인 생성 성공');
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     apiLogger.error({ error: error instanceof Error ? error.message : String(error) }, '소상공인 생성 실패');

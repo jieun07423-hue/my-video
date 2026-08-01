@@ -4,6 +4,7 @@ import { apiLogger } from '@/lib/logger';
 import { createApiErrorResponse, createBadRequestResponse } from '@/lib/api/handlers';
 import { createOrderWithStockDeduction } from '@/lib/services/orderInventorySync.service';
 import type { OrderItemInput } from '@/lib/services/orderInventorySync.service';
+import { kdsEventEmitter } from '@/lib/events/kds.event';
 
 export async function GET(request: NextRequest) {
   try {
@@ -58,9 +59,12 @@ export async function POST(request: NextRequest) {
 
     const result = await createOrderWithStockDeduction(db, storeId, orderItems, notes as string | undefined);
 
+    // KDS 실시간 주문 스트림에 브로드캐스트 이벤트 발행
+    kdsEventEmitter.emit('new-order', { storeId, order: result.order });
+
     apiLogger.info(
       { orderId: result.order.id, orderNumber: result.order.orderNumber, itemsCount: items.length },
-      'Order created with stock deduction'
+      'Order created with stock deduction and broadcasted to KDS'
     );
 
     return NextResponse.json(result, { status: 201 });

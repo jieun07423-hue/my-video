@@ -373,7 +373,7 @@ export default function QualityDashboardPage() {
                 <StatCard
                   title="평균 완성도"
                   value={metrics?.averageCompletenessScore || 0}
-                  color="blue"
+                  color="primary"
                   icon="📊"
                   subtitle="전체 사업체 평균"
                   delay={100}
@@ -381,7 +381,7 @@ export default function QualityDashboardPage() {
                 <StatCard
                   title="중복률"
                   value={metrics?.duplicateRate || 0}
-                  color="yellow"
+                  color="warning"
                   icon="🔄"
                   subtitle="중복 의심 비율"
                   delay={200}
@@ -389,7 +389,7 @@ export default function QualityDashboardPage() {
                 <StatCard
                   title="오래된 데이터"
                   value={metrics?.staleDataRate || 0}
-                  color="amber"
+                  color="warning"
                   icon="⏰"
                   subtitle="업데이트 필요 비율"
                   delay={300}
@@ -397,7 +397,7 @@ export default function QualityDashboardPage() {
                 <StatCard
                   title="심각한 이슈"
                   value={metrics?.criticalIssuesCount || 0}
-                  color="red"
+                  color="error"
                   icon="⚠️"
                   subtitle="즉시 수정 필요"
                   delay={400}

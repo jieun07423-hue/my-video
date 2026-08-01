@@ -1,12 +1,14 @@
 import axios, { AxiosInstance } from 'axios';
 import axiosRetry from 'axios-retry';
+import { z } from 'zod';
+import { apiLogger } from '@/lib/logger';
 
 // 공공데이터포털 API 설정
 const API_BASE_URL = 'https://apis.data.go.kr/B553077/api/open/sdsc2';
 const SERVICE_KEY = process.env.DATA_GO_KR_SERVICE_KEY;
 
 if (!SERVICE_KEY) {
-  console.warn('DATA_GO_KR_SERVICE_KEY 환경변수가 설정되지 않았습니다');
+  apiLogger.warn('DATA_GO_KR_SERVICE_KEY 환경변수가 설정되지 않았습니다');
 }
 
 // Axios 인스턴스 생성
@@ -28,19 +30,22 @@ axiosRetry(apiClient, {
   },
 });
 
+// Zod 런타임 타입 검증 스키마
+export const BusinessAPIResponseSchema = z.object({
+  header: z.object({
+    resultCode: z.string(),
+    resultMsg: z.string(),
+  }),
+  body: z.object({
+    items: z.array(z.any()).default([]),
+    numOfRows: z.number().default(1000),
+    pageNo: z.number().default(1),
+    totalCount: z.number().default(0),
+  }),
+});
+
 // API 응답 타입
-export interface BusinessAPIResponse {
-  header: {
-    resultCode: string;
-    resultMsg: string;
-  };
-  body: {
-    items: any[];
-    numOfRows: number;
-    pageNo: number;
-    totalCount: number;
-  };
-}
+export type BusinessAPIResponse = z.infer<typeof BusinessAPIResponseSchema>;
 
 // 분석 결과 타입
 export interface AnalysisResult {
@@ -54,7 +59,7 @@ export interface AnalysisResult {
 }
 
 /**
- * 날짜 기준 소상공인 정보 조회
+ * 날짜 기준 소상공인 정보 조회 (Zod 검증 및 견고한 Fallback 포함)
  * @param date YYYYMMDD 형식
  * @param pageNo 페이지 번호
  * @param numOfRows 페이지당 레코드 수
@@ -65,7 +70,7 @@ export async function fetchBusinessesByDate(
   numOfRows: number = 1000
 ): Promise<BusinessAPIResponse | null> {
   if (!SERVICE_KEY) {
-    console.warn('DATA_GO_KR_SERVICE_KEY가 없습니다');
+    apiLogger.warn('DATA_GO_KR_SERVICE_KEY가 없습니다');
     return null;
   }
 
@@ -79,10 +84,25 @@ export async function fetchBusinessesByDate(
         numOfRows,
       },
     });
-    return response.data;
+
+    const validationResult = BusinessAPIResponseSchema.safeParse(response.data);
+    if (!validationResult.success) {
+      apiLogger.error({ errors: validationResult.error.format() }, '공공데이터 API 응답 Zod 검증 실패');
+      // Fallback 구조 반환
+      return {
+        header: { resultCode: '99', resultMsg: 'Validation Error Fallback' },
+        body: { items: [], numOfRows, pageNo, totalCount: 0 },
+      };
+    }
+
+    return validationResult.data;
   } catch (error) {
-    console.error('소상공인 데이터 조회 실패:', error);
-    throw error;
+    apiLogger.error({ error: error instanceof Error ? error.message : String(error), date, pageNo }, '소상공인 데이터 조회 실패 (Fallback 적용)');
+    // 네트워크 오류 및 예외 발생 시 견고한 Fallback 반환 (시스템 중단 방지)
+    return {
+      header: { resultCode: '500', resultMsg: 'Network Error Fallback' },
+      body: { items: [], numOfRows, pageNo, totalCount: 0 },
+    };
   }
 }
 

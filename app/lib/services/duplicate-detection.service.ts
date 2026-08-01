@@ -516,3 +516,9 @@ export function getDuplicateStatistics(result: DuplicateDetectionResult): {
     recommendations,
   };
 }
+
+export const duplicateDetectionService = {
+  detectDuplicates,
+  mergeBusinessData,
+  getDuplicateStatistics,
+};

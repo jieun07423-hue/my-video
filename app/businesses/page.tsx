@@ -299,7 +299,7 @@ export default function BusinessesPage() {
           <StatCard 
             title="전체 소상공인" 
             value={stats.total} 
-            color="blue"
+            color="primary"
             icon="🏪"
             trend="up"
             trendValue={stats.newToday}
@@ -308,7 +308,7 @@ export default function BusinessesPage() {
           <StatCard 
             title="오늘 신규" 
             value={stats.newToday} 
-            color="green"
+            color="success"
             icon="🆕"
             trend="up"
             trendValue={15}
@@ -317,7 +317,7 @@ export default function BusinessesPage() {
           <StatCard 
             title="신규 등록" 
             value={stats.newRecords} 
-            color="amber"
+            color="warning"
             icon="📝"
             trend="neutral"
             trendValue={stats.newRecords}
@@ -326,7 +326,7 @@ export default function BusinessesPage() {
           <StatCard 
             title="영업 중" 
             value={stats.active} 
-            color="purple"
+            color="info"
             icon="🏃"
             trend="up"
             trendValue={stats.active - stats.inactive}

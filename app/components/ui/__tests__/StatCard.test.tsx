@@ -11,7 +11,7 @@ describe('StatCard', () => {
   });
 
   it('색상 옵션을 올바르게 적용해야 한다', () => {
-    const { container } = render(<StatCard title="테스트" value={50} color="green" />);
+    const { container } = render(<StatCard title="테스트" value={50} color="success" />);
     
     expect(container.firstChild).toBeTruthy();
   });

@@ -29,6 +29,15 @@ enum RecordStatus {
   verified // 검증됨
 }
 
+// 보강 상태
+enum EnrichmentStatus {
+  pending      // 대기
+  in_progress  // 진행 중
+  completed    // 완료
+  failed       // 실패
+  partial      // 부분 완료
+}
+
 // 어드민 사용자 권한
 enum AdminRole {
   super_admin // 최고 관리자
@@ -79,6 +88,45 @@ model Business {
   status       BusinessStatus @default(pending)
   recordStatus RecordStatus   @default(new)
 
+  // 영업 상세 정보 (보강 필드)
+  openTime       String? @map("open_time")        // 영업 시작 시간
+  closeTime      String? @map("close_time")       // 영업 종료 시간
+  holidayInfo    String? @map("holiday_info")     // 휴무 정보
+  parkingInfo    String? @map("parking_info")     // 주차 정보
+  menuInfo       String? @map("menu_info")        // 주요 메뉴/서비스
+  priceRange     String? @map("price_range")      // 가격대 (예: "10,000~30,000원")
+  capacity       Int?     @map("capacity")         // 수용 인원
+  facilityInfo   String? @map("facility_info")    // 시설 정보 (와이파이, 포장 등)
+  accessibility  String? @map("accessibility")    // 접근성 정보 (장애인 편의 등)
+  deliveryInfo   String? @map("delivery_info")    // 배달 가능 여부/권역
+  takeoutInfo    String? @map("takeout_info")     // 포장 가능 여부
+  reservationInfo String? @map("reservation_info") // 예약 가능 여부/방법
+
+  // 온라인 정보 (보강 필드)
+  websiteUrl       String? @map("website_url")      // 홈페이지 URL
+  blogUrl          String? @map("blog_url")         // 블로그 URL
+  instagramUrl     String? @map("instagram_url")    // 인스타그램 URL
+  facebookUrl      String? @map("facebook_url")     // 페이스북 URL
+  kakaoPlaceUrl    String? @map("kakao_place_url")  // 카카오플레이스 URL
+  naverPlaceUrl    String? @map("naver_place_url")  // 네이버플레이스 URL
+
+  // 리뷰/평점 정보 (보강 필드)
+  reviewCount      Int?     @default(0) @map("review_count")      // 리뷰 수
+  averageRating    Decimal? @map("average_rating") @db.Decimal(3, 2) // 평균 평점
+  reviewKeywords   String[] @default([]) @map("review_keywords")  // 리뷰 키워드 (긍정/부정)
+
+  // 이미지 정보 (보강 필드)
+  mainImageUrl     String? @map("main_image_url")    // 메인 이미지
+  imageUrls        String[] @default([]) @map("image_urls")       // 추가 이미지들
+  thumbnailUrl     String? @map("thumbnail_url")     // 썸네일
+
+  // 데이터 품질 메타데이터 (보강 필드)
+  enrichmentStatus EnrichmentStatus @default(pending) @map("enrichment_status") // 보강 상태
+  enrichmentSource String? @map("enrichment_source")  // 보강 데이터 출처
+  enrichmentScore  Decimal? @map("enrichment_score") @db.Decimal(5, 2) // 보강 완성도 점수 (0~100)
+  lastEnrichedAt   DateTime? @map("last_enriched_at") // 마지막 보강 일시
+  enrichmentData   Json?    @map("enrichment_data")    // 보강 원본 데이터 저장
+
   // 타임스탬프
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
@@ -89,14 +137,15 @@ model Business {
   externalId String? @map("external_id") // 외부 시스템 ID
 
   auditLogs     AuditLog[]
-  notes         Note[] // 비즈니스에 속한 노트들
-  claimRequests BusinessClaimRequest[] // 소유권 승인 요청 목록
+  notes         Note[]
+  claimRequests BusinessClaimRequest[]
 
   @@index([recordStatus, createdAt(sort: Desc)])
   @@index([status, createdAt(sort: Desc)])
   @@index([name])
   @@index([businessCode])
-  @@index([createdAt(sort: Desc)])
+  @@index([enrichmentStatus, createdAt(sort: Desc)])
+  @@index([enrichmentScore(sort: Desc)])
   @@map("businesses")
 }
 

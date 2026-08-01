@@ -1,5 +1,8 @@
 import { Prisma } from '@prisma/client';
-import { dbLogger } from '../logger';
+import { dbLogger } from '@/lib/logger';
+import { validationService, ValidationResult } from '@/lib/services/validation.service';
+import { eventPublisher } from '@/lib/services/event-publisher';
+import { statisticService } from '@/lib/services/statistic.service';
 import db from '@/lib/db';
 
 export interface CreateBusinessInput {
@@ -32,29 +35,151 @@ export interface SearchOptions {
   limit?: number;
 }
 
+export interface BatchCreateResult {
+  created: CreateBusinessInput[];
+  skipped: CreateBusinessInput[];
+  errors: Array<{ input: CreateBusinessInput; errors: string[] }>;
+  totalProcessed: number;
+  createdCount: number;
+  skippedCount: number;
+  errorCount: number;
+}
+
 export class BusinessRepository {
-  async createMany(data: CreateBusinessInput[]) {
+  private async validateAndSanitize(input: CreateBusinessInput): Promise<ValidationResult<CreateBusinessInput>> {
+    return validationService.validateBusinessInput(input);
+  }
+
+  async createMany(data: CreateBusinessInput[], options: { validate?: boolean; sanitize?: boolean } = {}): Promise<BatchCreateResult> {
+    const { validate = true, sanitize = true } = options;
     dbLogger.info({ count: data.length }, '소상공인 대량 생성 시작');
-    const result = await db.business.createMany({ data, skipDuplicates: true });
-    dbLogger.info({ created: result.count }, '소상공인 대량 생성 완료');
+
+    const created: CreateBusinessInput[] = [];
+    const skipped: CreateBusinessInput[] = [];
+    const errors: Array<{ input: CreateBusinessInput; errors: string[] }> = [];
+
+    for (const input of data) {
+      let validatedInput = input;
+
+      if (validate) {
+        const validation = await this.validateAndSanitize(input);
+        if (!validation.success) {
+          errors.push({ input, errors: validation.errors.map(e => e.message) });
+          continue;
+        }
+        validatedInput = validation.data!;
+        if (sanitize && validation.warnings.length > 0) {
+          dbLogger.warn({ input: input.bizesId, warnings: validation.warnings }, '검증 경고 발생');
+        }
+      }
+
+      if (sanitize) {
+        validatedInput = validationService.sanitizeBusinessInput(validatedInput) || validatedInput;
+      }
+
+      try {
+        const existing = await db.business.findUnique({ where: { bizesId: validatedInput.bizesId } });
+        if (existing) {
+          skipped.push(validatedInput);
+          continue;
+        }
+
+        await db.business.create({ data: validatedInput });
+        created.push(validatedInput);
+        
+        await eventPublisher.publishBusinessCreated(validatedInput.bizesId, validatedInput.name);
+        await statisticService.recordBusinessMetric('created', 1);
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        errors.push({ input: validatedInput, errors: [errorMsg] });
+        dbLogger.error({ bizesId: validatedInput.bizesId, error: errorMsg }, '비즈니스 생성 실패');
+      }
+    }
+
+    const result: BatchCreateResult = {
+      created,
+      skipped,
+      errors,
+      totalProcessed: data.length,
+      createdCount: created.length,
+      skippedCount: skipped.length,
+      errorCount: errors.length,
+    };
+
+    dbLogger.info({ created: created.length, skipped: skipped.length, errors: errors.length }, '소상공인 대량 생성 완료');
     return result;
   }
 
-  async upsertMany(data: CreateBusinessInput[]) {
+  async upsertMany(data: CreateBusinessInput[], options: { validate?: boolean; sanitize?: boolean; skipValidationOnUpdate?: boolean } = {}): Promise<BatchCreateResult> {
+    const { validate = true, sanitize = true, skipValidationOnUpdate = false } = options;
     dbLogger.info({ count: data.length }, '소상공인 대량 upsert 시작');
-    // Prisma는 upsertMany를 지원하지 않으므로 루프로 처리하거나 
-    // 실제 프로덕션에서는 별도의 bulk upsert 로직을 구현해야 합니다.
-    const results = await Promise.all(
-      data.map(item => 
-        db.business.upsert({
-          where: { bizesId: item.bizesId },
-          update: item,
-          create: item,
-        })
-      )
-    );
-    dbLogger.info({ processed: results.length }, '소상공인 대량 upsert 완료');
-    return results;
+
+    const created: CreateBusinessInput[] = [];
+    const skipped: CreateBusinessInput[] = [];
+    const errors: Array<{ input: CreateBusinessInput; errors: string[] }> = [];
+
+    for (const input of data) {
+      let validatedInput = input;
+
+      if (validate) {
+        const validation = await this.validateAndSanitize(input);
+        if (!validation.success) {
+          errors.push({ input, errors: validation.errors.map(e => e.message) });
+          continue;
+        }
+        validatedInput = validation.data!;
+      }
+
+      if (sanitize) {
+        validatedInput = validationService.sanitizeBusinessInput(validatedInput) || validatedInput;
+      }
+
+      try {
+        const existing = await db.business.findUnique({ where: { bizesId: validatedInput.bizesId } });
+        
+        if (existing) {
+          const changes: Record<string, { from: unknown; to: unknown }> = {};
+          for (const key of Object.keys(validatedInput) as Array<keyof CreateBusinessInput>) {
+            if (validatedInput[key] !== existing[key]) {
+              changes[key] = { from: existing[key], to: validatedInput[key] };
+            }
+          }
+
+          await db.business.update({
+            where: { bizesId: validatedInput.bizesId },
+            data: validatedInput,
+          });
+
+          if (Object.keys(changes).length > 0) {
+            await eventPublisher.publishBusinessUpdated(validatedInput.bizesId, validatedInput.name, changes);
+          }
+          skipped.push(validatedInput);
+        } else {
+          await db.business.create({ data: validatedInput });
+          created.push(validatedInput);
+          await eventPublisher.publishBusinessCreated(validatedInput.bizesId, validatedInput.name);
+        }
+
+        await statisticService.recordBusinessMetric(existing ? 'updated' : 'created', 1);
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        errors.push({ input: validatedInput, errors: [errorMsg] });
+        dbLogger.error({ bizesId: validatedInput.bizesId, error: errorMsg }, '비즈니스 upsert 실패');
+      }
+    }
+
+    const result: BatchCreateResult = {
+      created,
+      skipped,
+      errors,
+      totalProcessed: data.length,
+      createdCount: created.length,
+      skippedCount: skipped.length,
+      errorCount: errors.length,
+    };
+
+    dbLogger.info({ created: created.length, updated: skipped.length, errors: errors.length }, '소상공인 대량 upsert 완료');
+    return result;
   }
 
   async findByBizesId(bizesId: string) {
@@ -64,7 +189,6 @@ export class BusinessRepository {
   async search(options: SearchOptions) {
     const { search, status, recordStatus, businessCode, page = 1, limit = 20 } = options;
 
-    // 실제 Prisma 쿼리 조건 생성
     const where: Prisma.BusinessWhereInput = {};
     if (search) {
       where.OR = [
@@ -106,18 +230,23 @@ export class BusinessRepository {
 
   async markAsVerified(bizesId: string) {
     dbLogger.info({ bizesId }, '소상공인 검증 처리');
-    return await db.business.update({
+    const business = await db.business.update({
       where: { bizesId },
       data: { recordStatus: 'verified' },
     });
+    await eventPublisher.publishBusinessVerified(bizesId, business.name);
+    await statisticService.recordBusinessMetric('verified', 1);
+    return business;
   }
 
   async markAsSynced(bizesId: string) {
     dbLogger.info({ bizesId }, '소상공인 동기화 처리');
-    return await db.business.update({
+    const business = await db.business.update({
       where: { bizesId },
       data: { recordStatus: 'synced' },
     });
+    await statisticService.recordBusinessMetric('updated', 1);
+    return business;
   }
 
   async getStats() {
@@ -144,31 +273,70 @@ export class BusinessRepository {
 
   async update(id: string, data: Partial<CreateBusinessInput>) {
     dbLogger.info({ id }, '소상공인 정보 수정 시작');
+    const existing = await db.business.findUnique({ where: { id } });
     const result = await db.business.update({
       where: { id },
       data,
     });
     dbLogger.info({ id }, '소상공인 정보 수정 완료');
+
+    if (existing) {
+      const changes: Record<string, { from: unknown; to: unknown }> = {};
+      for (const key of Object.keys(data) as Array<keyof CreateBusinessInput>) {
+        if (data[key] !== undefined && existing[key] !== data[key]) {
+          changes[key] = { from: existing[key], to: data[key] };
+        }
+      }
+      if (Object.keys(changes).length > 0) {
+        await eventPublisher.publishBusinessUpdated(result.bizesId, result.name, changes);
+      }
+    }
+
+    await statisticService.recordBusinessMetric('updated', 1);
     return result;
   }
 
   async delete(id: string) {
     dbLogger.info({ id }, '소상공인 삭제 시작');
+    const existing = await db.business.findUnique({ where: { id } });
     const result = await db.business.delete({
       where: { id },
     });
     dbLogger.info({ id }, '소상공인 삭제 완료');
+
+    if (existing) {
+      await eventPublisher.publishBusinessDeleted(existing.bizesId);
+      await statisticService.recordBusinessMetric('deleted', 1);
+    }
+
     return result;
   }
 
   async getDistinctBusinessCodes() {
-    // Prisma groupBy 또는 distinct 사용
     const results = await db.business.findMany({
       distinct: ['businessCode'],
       select: { businessCode: true, businessName: true },
       where: { businessCode: { not: null } },
     });
     return results;
+  }
+
+  async bulkUpdateStatus(bizesIds: string[], status: CreateBusinessInput['status']): Promise<number> {
+    const result = await db.business.updateMany({
+      where: { bizesId: { in: bizesIds } },
+      data: { status },
+    });
+    dbLogger.info({ count: result.count, status }, '소상공인 상태 대량 변경');
+    return result.count;
+  }
+
+  async bulkUpdateRecordStatus(bizesIds: string[], recordStatus: CreateBusinessInput['recordStatus']): Promise<number> {
+    const result = await db.business.updateMany({
+      where: { bizesId: { in: bizesIds } },
+      data: { recordStatus },
+    });
+    dbLogger.info({ count: result.count, recordStatus }, '소상공인 레코드 상태 대량 변경');
+    return result.count;
   }
 }
 

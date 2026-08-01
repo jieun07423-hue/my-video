@@ -145,9 +145,9 @@ export default function SeoulPermitsPage() {
         {/* 통계 카드 */}
         {stats && (
           <div className="mb-8 grid gap-6 sm:grid-cols-3">
-            <StatCard title="전체 업소" value={stats.total} color="blue" icon="🏪" delay={100} />
-            <StatCard title="영업 중" value={stats.active} color="green" icon="✅" delay={200} />
-            <StatCard title="폐업" value={stats.closed} color="amber" icon="📋" delay={300} />
+            <StatCard title="전체 업소" value={stats.total} color="primary" icon="🏪" delay={100} />
+            <StatCard title="영업 중" value={stats.active} color="success" icon="✅" delay={200} />
+            <StatCard title="폐업" value={stats.closed} color="error" icon="📋" delay={300} />
           </div>
         )}
 
