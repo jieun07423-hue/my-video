@@ -29,10 +29,11 @@ export async function GET(request: NextRequest) {
         }
         break;
 
-      case 'patterns':
+      case 'patterns': {
         const limit = parseInt(searchParams.get('limit') || '50');
         data = await automationService.getPatterns(limit);
         break;
+      }
 
       case 'analyze':
         data = await automationService.analyzeAndGenerateRules();

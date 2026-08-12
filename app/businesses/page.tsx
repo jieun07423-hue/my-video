@@ -147,9 +147,8 @@ function Pagination({
   totalPages: number; 
   onPageChange: (page: number) => void;
 }) {
-  if (totalPages <= 1) return null;
-
   const pages = useMemo(() => {
+    if (totalPages <= 1) return [];
     const delta = 2;
     const range = [];
     const rangeWithDots = [];
@@ -174,6 +173,8 @@ function Pagination({
 
     return rangeWithDots;
   }, [currentPage, totalPages]);
+
+  if (totalPages <= 1) return null;
 
   return (
     <div className="flex items-center justify-center space-x-2 mt-8">

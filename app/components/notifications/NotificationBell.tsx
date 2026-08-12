@@ -40,6 +40,7 @@ export default function NotificationBell() {
         });
         setUnreadCount(prev => prev + 1);
       } catch {
+        // JSON parse error - ignore invalid events
       }
     };
 

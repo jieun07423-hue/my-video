@@ -14,7 +14,7 @@ Keep responses brief and friendly in Korean.`;
 
 // 날짜 파싱 함수
 function parseDate(text: string): string | null {
-  const datePattern = /(\d{4})[년\-\/](\d{1,2})[월\-\/](\d{1,2})/;
+  const datePattern = /(\d{4})[년/-](\d{1,2})[월/-](\d{1,2})/;
   const match = text.match(datePattern);
   if (match) {
     const year = match[1];

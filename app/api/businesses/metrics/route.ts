@@ -49,13 +49,14 @@ export async function GET(request: NextRequest) {
         data = await statisticService.getSummary(metric, since);
         break;
 
-      case 'counter':
+      case 'counter': {
         const counterName = searchParams.get('name');
         if (!counterName) {
           return NextResponse.json({ error: 'name 파라미터가 필요합니다' }, { status: 400 });
         }
         data = await statisticService.getCounter(counterName);
         break;
+      }
 
       default:
         return NextResponse.json({ error: '지원하지 않는 타입입니다' }, { status: 400 });

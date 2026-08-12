@@ -34,18 +34,20 @@ export async function GET(request: NextRequest) {
         data = await businessEnrichmentService.getStatistics();
         break;
 
-      case 'results':
+      case 'results': {
         const limit = parseInt(searchParams.get('limit') || '50');
         const offset = parseInt(searchParams.get('offset') || '0');
         const status = searchParams.get('status') as any;
         data = await businessEnrichmentService.getEnrichmentResults({ limit, offset, status });
         break;
+      }
 
-      case 'needs-enrichment':
+      case 'needs-enrichment': {
         const scoreThreshold = parseInt(searchParams.get('scoreThreshold') || '80');
         const needsLimit = parseInt(searchParams.get('limit') || '100');
         data = await businessEnrichmentService.getBusinessesNeedingEnrichment(scoreThreshold, needsLimit);
         break;
+      }
 
       default:
         return NextResponse.json({ error: '지원하지 않는 액션입니다' }, { status: 400 });

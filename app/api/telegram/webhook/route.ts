@@ -96,7 +96,7 @@ async function handleCallbackQuery(callbackQuery: { id: string; from?: { id: num
           createMainMenuKeyboard()
         );
         break;
-      case 'ads':
+      case 'ads': {
         const campaigns = await adRepository.findCampaignsByUserId(userId, { limit: 5 });
         if (campaigns.length === 0) {
           await sendTelegramMessage(chatId, '📊 생성한 광고가 없습니다.\n/ad 명령어로 새로운 광고를 만들어보세요!');
@@ -108,13 +108,15 @@ async function handleCallbackQuery(callbackQuery: { id: string; from?: { id: num
           await sendTelegramMessage(chatId, message);
         }
         break;
-      case 'settings':
+      }
+      case 'settings': {
         const rateStatus = adGeneratorService.getRateLimitStatus(userId);
         await sendTelegramMessage(
           chatId,
           `⚙️ *설정*\n\nRate Limit: ${rateStatus.count}/${rateStatus.limit}\n남은 요청: ${rateStatus.limit - rateStatus.count}`
         );
         break;
+      }
       case 'help':
         await sendTelegramMessage(
           chatId,
