@@ -13,6 +13,7 @@ import { Progress } from '@/components/ui/core/Progress';
 import Navbar from '@/components/Navbar';
 import {
   Building2,
+  Plus,
   TrendingUp,
   RefreshCw,
   ExternalLink,
@@ -57,6 +58,8 @@ interface TrendData {
   campaignTrends: { date: string; value: number; label: string }[];
   industryDistribution: { name: string; count: number; percentage: number }[];
   monthlyRevenue: { date: string; value: number; label: string }[];
+  monthlySales: { date: string; value: number; label: string }[];
+  monthlyActive: { date: string; value: number; label: string }[];
 }
 
 interface AdStats {
@@ -155,11 +158,11 @@ export default function DashboardPage() {
     fetchData();
   }, [fetchData]);
 
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return '-';
-    const date = new Date(dateStr);
+  const formatDate = (date: Date | string | null) => {
+    if (!date) return '-';
+    const d = typeof date === 'string' ? new Date(date) : date;
     const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
+    const diffMs = now.getTime() - d.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
@@ -168,7 +171,7 @@ export default function DashboardPage() {
     if (diffMins < 60) return `${diffMins}분 전`;
     if (diffHours < 24) return `${diffHours}시간 전`;
     if (diffDays < 7) return `${diffDays}일 전`;
-    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
+    return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
   const statsCards = [
@@ -216,37 +219,54 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">대시보드</h1>
-              <Badge variant="success" size="sm">실시간</Badge>
-            </div>
-            <p className="mt-1 text-gray-600 dark:text-gray-400">소상공인 정보 종합 현황 및 실시간 모니터링</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" leftIcon={<Search />} className="hidden sm:inline-flex">
-              검색
-            </Button>
-            <Button variant="ghost" size="sm" leftIcon={<Bell />} />
-            <Button variant="ghost" size="sm" leftIcon={<Settings />} />
-            <Button
-              onClick={fetchData}
-              disabled={loading}
-              variant="outline"
-              size="sm"
-              leftIcon={<RefreshCw size={16} className={loading ? 'animate-spin' : ''} />}
-            >
-              새로고침
-            </Button>
-            <Button variant="primary" size="sm" leftIcon={<Download size={16} />}>
-              리포트 다운로드
-            </Button>
-          </div>
+      {/* ==========================================================================
+         헤더 프레임 - 대시보드 타이틀 및 소개
+         ========================================================================== */}
+      <header className="bg-[var(--canvas)] border-b border-hairline-strong mb-8">
+        <div className="max-w-7xl mx-auto py-6 px-4">
+          <h1 className="text-3xl font-extrabold leading-none tracking-widest text-[var(--ink)]">
+            대시보드
+          </h1>
+          <p className="text-[var(--mute)] text-sm mt-2">
+            실시간 비즈니스 상태 한눈에 보기
+          </p>
         </div>
+      </header>
 
+      {/* ==========================================================================
+         메인 컨텐츠 프레임 - 메트릭스, 통계, 트렌드
+         ========================================================================== */}
+      <main className="max-w-7xl mx-auto">
+
+        {/* DESIGN.md 스타일 메트릭스 배너 */}
+        {metrics && <DesignMDMetricsBanner metrics={metrics} />}
+
+        {/* 통계 카드 섹션 */}
+        <section className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {statsCards.map((card, index) => (
+            <StatCard key={card.title} {...card} />
+          ))}
+        </section>
+
+        {/* 트렌드 차트 섹션 */}
+        {trends && (
+          <section className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2" aria-label="트렌드 분석">
+            <div>
+              <TrendChart title="일일 방문자 수" data={trends.weeklyVisitors} color="#6366f1" height={300} />
+            </div>
+            <div>
+              <TrendChart title="일일 가입자 수" data={trends.weeklySignups} color="#22c55e" height={300} />
+            </div>
+            <div>
+              <TrendChart title="주간 매출 추이" data={trends.monthlySales} color="#eab308" height={300} />
+            </div>
+            <div>
+              <TrendChart title="월간 활성 비즈니스" data={trends.monthlyActive} color="#f97316" height={300} />
+            </div>
+          </section>
+        )}
+
+        {/* 오류 상태 */}
         {error && (
           <div className="mb-6 rounded-xl border border-error-200 bg-error-50 dark:bg-error-900/20 p-4">
             <div className="flex items-center gap-2 text-error-700 dark:text-error-300">
@@ -284,404 +304,73 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
-            {/* 메인 통계 카드 */}
-            <section className="mb-8" aria-label="소상공인 현황">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  <div className="flex items-center gap-2">
-                    <Building2 size={20} className="text-primary-600 dark:text-primary-400" />
-                    소상공인 현황
+            {/* ==========================================================================
+               사이드바 프레임 - 빠른 메뉴, 필터, 인사이트
+               ========================================================================== */}
+            <aside className="lg:col-span-2 bg-[var(--canvas)] rounded-none p-6 mb-8">
+              <h2 className="text-lg font-bold text-[var(--ink)] mb-4">빠른 메뉴</h2>
+              <div className="space-y-4">
+                <Link href="/businesses" className="group relative rounded-xl border border-gray-100 dark:border-gray-800 p-4 transition-all hover:border-primary-200 dark:hover:border-primary-800">
+                  <div className="absolute top-3 right-3 p-2 rounded-xl bg-primary-100 dark:bg-primary-900/30">
+                    <Building2 className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                   </div>
-                </h2>
-                <Button variant="ghost" size="sm" rightIcon={<ChevronRight size={14} />}>
-                  상세 보기
-                </Button>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-600 dark:group-hover:text-primary-400">
+                      소상공인 목록
+                    </h3>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">전체 소상공인 조회</p>
+                  </div>
+                </Link>
+                <Link href="/businesses/create" className="group relative rounded-xl border border-gray-100 dark:border-gray-800 p-4 transition-all hover:border-primary-200 dark:hover:border-primary-800">
+                  <div className="absolute top-3 right-3 p-2 rounded-xl bg-primary-100 dark:bg-primary-900/30">
+                    <Plus className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-600 dark:group-hover:text-primary-400">
+                      새로운 사업체 등록
+                    </h3>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">새로운 소상공인 등록</p>
+                  </div>
+                </Link>
+                <Link href="/sync" className="group relative rounded-xl border border-gray-100 dark:border-gray-800 p-4 transition-all hover:border-primary-200 dark:hover:border-primary-800">
+                  <div className="absolute top-3 right-3 p-2 rounded-xl bg-primary-100 dark:bg-primary-900/30">
+                    <RefreshCw className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-600 dark:group-hover:text-primary-400">
+                      데이터 동기화
+                    </h3>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">공공데이터포털 동기화</p>
+                  </div>
+                </Link>
+                <Link href="/settings" className="group relative rounded-xl border border-gray-100 dark:border-gray-800 p-4 transition-all hover:border-primary-200 dark:hover:border-primary-800">
+                  <div className="absolute top-3 right-3 p-2 rounded-xl bg-primary-100 dark:bg-primary-900/30">
+                    <Settings className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-600 dark:group-hover:text-primary-400">
+                      설정
+                    </h3>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">시스템 설정</p>
+                  </div>
+                </Link>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {statsCards.map((card, index) => (
-                  <StatCard key={card.title} {...card} />
-                ))}
+            </aside>
+
+            {/* 푸터 프레임 - 저작권, 버전, 액션 버튼 */}
+            <footer className="mt-8 border-t border-hairline-strong pt-8 text-[var(--mute)] text-xs">
+              <div className="max-w-7xl mx-auto">
+                <p>
+                2026 소상공인 정보 트래커 | 데이터 갱신: {lastRefreshed ? formatDate(lastRefreshed) : 'N/A'}
+                </p>
+                <nav className="mt-4 flex flex-wrap gap-4">
+                  <a href="/admin" className="hover:text-primary-600 dark:hover:text-primary-400">관리자 페이지</a>
+                  <a href="/help" className="hover:text-gray-400 dark:hover:text-gray-500">도움말</a>
+                  <a href="/api/dashboard/stats/download" className="hover:text-primary-600 dark:hover:text-primary-400">데이터 다운로드</a>
+                </nav>
+                <p className="mt-2 text-xs">© 2026 소상공인 트래커. All rights reserved.</p>
               </div>
-            </section>
-
-            {/* 메트릭스 카드 */}
-            {metrics && (
-              <section className="mb-8" aria-label="시스템 메트릭">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    <div className="flex items-center gap-2">
-                      <Zap size={20} className="text-warning-600 dark:text-warning-400" />
-                      시스템 메트릭
-                    </div>
-                  </h2>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  <StatCard 
-                    title="동기화 성공률" 
-                    value={`${metrics.syncSuccessRate}%`} 
-                    color="success" 
-                    icon={<Database className="w-5 h-5" />}
-                    trend="up"
-                    trendValue={2.3}
-                    subtitle="목표 95% 달성"
-                    delay={100}
-                  />
-                  <StatCard 
-                    title="평균 응답 시간" 
-                    value={`${metrics.avgResponseTime}ms`} 
-                    color="info" 
-                    icon={<Zap className="w-5 h-5" />}
-                    trend="down"
-                    trendValue={15}
-                    subtitle="목표 500ms 이내"
-                    delay={200}
-                  />
-                  <StatCard 
-                    title="데이터 품질 점수" 
-                    value={`${metrics.dataQualityScore}/100`} 
-                    color="primary" 
-                    icon={<Shield className="w-5 h-5" />}
-                    trend="up"
-                    trendValue={5}
-                    subtitle="전월 대비 5점 상승"
-                    delay={300}
-                  />
-                  <StatCard 
-                    title="활성 사용자" 
-                    value={metrics.activeUsers} 
-                    color="warning" 
-                    icon={<Users className="w-5 h-5" />}
-                    trend="up"
-                    trendValue={120}
-                    subtitle="일일 활성 사용자"
-                    delay={400}
-                  />
-                </div>
-              </section>
-            )}
-
-            {/* DESIGN.md 스타일 메트릭스 배너 */}
-            {metrics && <DesignMDMetricsBanner metrics={metrics} />}
-
-            {/* 트렌드 차트 */}
-            {trends && (
-              <section className="mb-8" aria-label="트렌드 분석">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    <div className="flex items-center gap-2">
-                      <BarChart3 size={20} className="text-primary-600 dark:text-primary-400" />
-                      트렌드 분석
-                    </div>
-                  </h2>
-                  <select className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                    <option value="week">최근 7일</option>
-                    <option value="month">최근 30일</option>
-                    <option value="quarter">최근 90일</option>
-                  </select>
-                </div>
-                <div className="grid gap-6 lg:grid-cols-2">
-                  <TrendChart title="일일 방문자 수" data={trends.weeklyVisitors} color="#6366f1" height={300} />
-                  <TrendChart title="일일 가입자 수" data={trends.weeklySignups} color="#22c55e" height={300} />
-                  <TrendChart title="광고 캠페인 추이" data={trends.campaignTrends} color="#a855f7" height={300} />
-                  <TrendChart title="월별 매출 추이" data={trends.monthlyRevenue} format="currency" color="#f97316" height={300} />
-                </div>
-                <div className="mt-6">
-                  <IndustryChart data={trends.industryDistribution} />
-                </div>
-              </section>
-            )}
-
-            {/* 동기화 상태 & 광고 통계 */}
-            <section className="mb-8" aria-label="동기화 및 광고 현황">
-              <div className="grid gap-6 lg:grid-cols-2">
-                {/* 동기화 상태 */}
-                <Card variant="elevated">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="p-2 rounded-xl bg-primary-100 dark:bg-primary-900/30">
-                          <RefreshCw size={18} className="text-primary-600 dark:text-primary-400" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-base">데이터 동기화 상태</CardTitle>
-                          <CardDescription>공공데이터포털 연동 현황</CardDescription>
-                        </div>
-                      </div>
-                      <Link href="/admin" className="text-sm font-medium text-primary-600 hover:text-primary-800 flex items-center gap-1">
-                        관리 페이지
-                        <ExternalLink size={12} />
-                      </Link>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    {syncState ? (
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">동기화 상태</span>
-                          <SyncStatusIndicator status={syncState.syncStatus} animated />
-                        </div>
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">마지막 동기화</span>
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{formatDate(syncState.lastSyncedAt)}</span>
-                        </div>
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">누적 동기화</span>
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{(syncState.totalSynced ?? 0).toLocaleString()}건</span>
-                        </div>
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">신규 발견</span>
-                          <span className="text-sm font-medium text-primary-600 dark:text-primary-400">{(syncState.newRecordsCount ?? 0).toLocaleString()}건</span>
-                        </div>
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">성공률</span>
-                          <span className="text-sm font-medium text-success-600 dark:text-success-400">
-                            {syncState.syncCount > 0 ? ((syncState.totalSynced / syncState.syncCount) * 100).toFixed(1) : 0}%
-                          </span>
-                        </div>
-                        {syncState.errorMessage && (
-                          <div className="rounded-xl border border-error-200 bg-error-50 dark:bg-error-900/20 p-3">
-                            <p className="flex items-center gap-1.5 text-sm text-error-700 dark:text-error-300">
-                              <AlertCircle size={14} />
-                              {syncState.errorMessage}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500 dark:text-gray-400">동기화 상태를 불러올 수 없습니다.</p>
-                    )}
-                  </CardContent>
-                  <CardFooter className="pt-0">
-                    <Button variant="primary" size="sm" fullWidth leftIcon={<RefreshCw size={14} />}>
-                      수동 동기화 실행
-                    </Button>
-                  </CardFooter>
-                </Card>
-
-                {/* 광고 캠페인 통계 */}
-                <Card variant="elevated">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="p-2 rounded-xl bg-warning-100 dark:bg-warning-900/30">
-                          <TrendingUp size={18} className="text-warning-600 dark:text-warning-400" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-base">광고 캠페인 현황</CardTitle>
-                          <CardDescription>AI 광고 생성 현황</CardDescription>
-                        </div>
-                      </div>
-                      <Link href="/ad" className="text-sm font-medium text-primary-600 hover:text-primary-800 flex items-center gap-1">
-                        광고 생성
-                        <ExternalLink size={12} />
-                      </Link>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    {adStats ? (
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">전체 캠페인</span>
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{adStats.campaigns.total}개</span>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <StatusBadge status="success" />
-                              <span className="text-sm text-gray-600 dark:text-gray-400">완료</span>
-                            </div>
-                            <span className="text-sm font-medium text-success-600 dark:text-success-400">{adStats.campaigns.completed}개</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <StatusBadge status="processing" />
-                              <span className="text-sm text-gray-600 dark:text-gray-400">생성 중</span>
-                            </div>
-                            <span className="text-sm font-medium text-primary-600 dark:text-primary-400">{adStats.campaigns.generating}개</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <StatusBadge status="failed" />
-                              <span className="text-sm text-gray-600 dark:text-gray-400">실패</span>
-                            </div>
-                            <span className="text-sm font-medium text-error-600 dark:text-error-400">{adStats.campaigns.failed}개</span>
-                          </div>
-                        </div>
-                        {adStats.cache && (
-                          <div className="rounded-xl bg-gray-50 dark:bg-gray-800/50 p-3">
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              캐시: {adStats.cache.keys}개 키 / {adStats.cache.size} 크기
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500 dark:text-gray-400">광고 데이터를 불러올 수 없습니다.</p>
-                    )}
-                  </CardContent>
-                  <CardFooter className="pt-0">
-                    <Button variant="primary" size="sm" fullWidth leftIcon={<Zap size={14} />}>
-                      광고 생성하기
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </div>
-            </section>
-
-            {/* 빠른 메뉴 & 시스템 상태 */}
-            <section className="mb-8" aria-label="빠른 메뉴">
-              <div className="grid gap-6 lg:grid-cols-3">
-                <Card variant="elevated">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="p-2 rounded-xl bg-secondary-100 dark:bg-secondary-800">
-                          <BarChart3 size={18} className="text-primary-600 dark:text-primary-400" />
-                        </div>
-                        <CardTitle className="text-base">빠른 메뉴</CardTitle>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {[
-                        { href: '/businesses', label: '소상공인 목록', desc: '전체 소상공인 조회', icon: Building2, color: 'primary' },
-                        { href: '/seoul-permits', label: '서울 인허가', desc: '서울시 인허가 정보', icon: Shield, color: 'success' },
-                        { href: '/ad', label: '광고 생성', desc: 'AI 광고 카피 생성', icon: Zap, color: 'warning' },
-                        { href: '/new', label: '신규 등록', desc: '신규 소상공인 확인', icon: Users, color: 'info' },
-                      ].map((link) => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className="group relative rounded-xl border border-gray-100 dark:border-gray-800 p-4 transition-all hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-md"
-                        >
-                          <div className={`absolute top-3 right-3 p-2 rounded-xl bg-${link.color}-100 dark:bg-${link.color}-900/30`}>
-                            <link.icon className={`w-5 h-5 text-${link.color}-600 dark:text-${link.color}-400`} />
-                          </div>
-                          <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-600 dark:group-hover:text-primary-400">{link.label}</h3>
-                          <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{link.desc}</p>
-                        </Link>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card variant="elevated" className="lg:col-span-2">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="p-2 rounded-xl bg-success-100 dark:bg-success-900/30">
-                          <CheckCircle size={18} className="text-success-600 dark:text-success-400" />
-                        </div>
-                        <CardTitle className="text-base">시스템 상태</CardTitle>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Progress value={95} max={100} size="sm" showLabel variant="success" className="w-32" />
-                        <span className="text-xs font-medium text-success-600 dark:text-success-400">95%</span>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-3">
-{[
-                        { label: '데이터베이스 연결', status: 'success' as const, detail: '정상 연결됨' },
-                        { label: 'Redis 캐시', status: 'success' as const, detail: '히트율 87%' },
-                        { label: '공공데이터포털 API', status: 'success' as const, detail: '응답 시간 243ms' },
-                        { label: '이메일 발송 서비스', status: 'pending' as const, detail: '일부 지연 발생' },
-                        { label: '슬랙 알림', status: 'success' as const, detail: '정상 작동' },
-                      ].map((item) => (
-                        <div key={item.label} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                          <div className="flex items-center gap-3">
-                            <StatusBadge status={item.status} />
-                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.label}</span>
-                          </div>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">{item.detail}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </section>
-
-            {/* 최근 활동 & 알림 */}
-            <section className="mb-8" aria-label="최근 활동">
-              <div className="grid gap-6 lg:grid-cols-2">
-                <Card variant="elevated">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="p-2 rounded-xl bg-primary-100 dark:bg-primary-900/30">
-                          <Clock size={18} className="text-primary-600 dark:text-primary-400" />
-                        </div>
-                        <CardTitle className="text-base">최근 동기화 이력</CardTitle>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-3">
-                      {[
-                        { time: '2분 전', action: '공공데이터포털 동기화', status: 'success' as const, count: '1,234건' },
-                        { time: '1시간 전', action: '데이터 품질 검사', status: 'success' as const, count: '98.7%' },
-                        { time: '3시간 전', action: '중복 데이터 병합', status: 'success' as const, count: '23건 병합' },
-                        { time: '6시간 전', action: '스케줄 동기화', status: 'success' as const, count: '5,678건' },
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-green-100 dark:bg-green-900/30">
-                              <CheckCircle size={14} className="text-green-600 dark:text-green-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.action}</p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">{item.time}</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.count}</span>
-                            <StatusBadge status={item.status} className="ml-2" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card variant="elevated">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="p-2 rounded-xl bg-warning-100 dark:bg-warning-900/30">
-                          <Bell size={18} className="text-warning-600 dark:text-warning-400" />
-                        </div>
-                        <CardTitle className="text-base">알림 및 경고</CardTitle>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-3">
-                      {[
-                        { type: 'warning', title: '이메일 발송 지연', message: '일부 이메일 발송이 지연되고 있습니다.', time: '10분 전' },
-                        { type: 'info', title: '신규 데이터 업데이트', message: '공공데이터포털에서 234건의 신규 데이터가 업데이트되었습니다.', time: '1시간 전' },
-                        { type: 'success', title: '동기화 완료', message: '오전 06:00 예약 동기화가 성공적으로 완료되었습니다.', time: '6시간 전' },
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${item.type === 'warning' ? 'bg-yellow-100 dark:bg-yellow-900/30' : item.type === 'success' ? 'bg-green-100 dark:bg-green-900/30' : 'bg-blue-100 dark:bg-blue-900/30'}`}>
-                            {item.type === 'warning' && <AlertCircle size={14} className="text-yellow-600 dark:text-yellow-400" />}
-                            {item.type === 'success' && <CheckCircle size={14} className="text-green-600 dark:text-green-400" />}
-                            {item.type === 'info' && <Info size={14} className="text-blue-600 dark:text-blue-400" />}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.title}</p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{item.message}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{item.time}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </section>
+            </footer>
           </>
         )}
       </main>
