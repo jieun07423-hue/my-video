@@ -16,11 +16,21 @@ const redisConfig = {
   },
 };
 
-export const redis = new Redis(redisConfig);
+// 브라우저에서는 Redis 클라이언트를 생성하지 않는다 (서버 전용 연결).
+// 클라이언트 번들에 이 모듈이 포함되어도 ioredis가 연결을 시도하지 않아
+// 'Reddis 연결 실패' 경고가 브라우저 console에 표시되지 않는다.
+const isBrowser = typeof window !== 'undefined';
 
-redis.on('error', (err) => {
-  apiLogger.warn({ error: err.message }, 'Redis 연결 실패 (오프라인 모드 또는 에뮬레이션 폴백 사용)');
-});
+export const redis =
+  isBrowser
+    ? (null as unknown as Redis)
+    : new Redis(redisConfig);
+
+if (!isBrowser && redis) {
+  redis.on('error', (err) => {
+    apiLogger.warn({ error: err.message }, 'Redis 연결 실패 (오프라인 모드 또는 에뮬레이션 폴백 사용)');
+  });
+}
 
 export const bullConnection: ConnectionOptions = {
   ...redisConfig,
