@@ -422,11 +422,11 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
                           <span className="text-sm text-gray-600 dark:text-gray-400">누적 동기화</span>
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{syncState.totalSynced.toLocaleString()}건</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{(syncState.totalSynced ?? 0).toLocaleString()}건</span>
                         </div>
                         <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
                           <span className="text-sm text-gray-600 dark:text-gray-400">신규 발견</span>
-                          <span className="text-sm font-medium text-primary-600 dark:text-primary-400">{syncState.newRecordsCount.toLocaleString()}건</span>
+                          <span className="text-sm font-medium text-primary-600 dark:text-primary-400">{(syncState.newRecordsCount ?? 0).toLocaleString()}건</span>
                         </div>
                         <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
                           <span className="text-sm text-gray-600 dark:text-gray-400">성공률</span>
