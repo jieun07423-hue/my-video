@@ -2,6 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { apiLogger } from '@/lib/logger';
 
+export async function GET(request: NextRequest) {
+  try {
+    const stores = await db.store.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: 'asc' },
+      select: { id: true, name: true, slug: true, businessType: true },
+    });
+
+    apiLogger.info({ count: stores.length }, '스토어 목록 조회');
+    return NextResponse.json({ data: stores });
+  } catch (error) {
+    apiLogger.error({ error: error instanceof Error ? error.message : String(error) }, '스토어 목록 조회 실패');
+    return NextResponse.json({ error: '스토어 목록 조회에 실패했습니다.' }, { status: 500 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

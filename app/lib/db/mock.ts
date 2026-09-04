@@ -82,6 +82,69 @@ const mockStockHistoryData: Array<Record<string, unknown>> = [];
 const mockWebhookEndpointData: Array<Record<string, unknown>> = [];
 const mockWebhookDeliveryLogData: Array<Record<string, unknown>> = [];
 
+// Prisma where 조건의 개별 필드(단순값 또는 연산자 객체)를 단일 값과 비교한다.
+function matchesFieldFilter(actual: unknown, filter: unknown): boolean {
+  if (filter && typeof filter === 'object' && !(filter instanceof Date)) {
+    const ops = filter as Record<string, unknown>;
+    let matched = true;
+    for (const [op, expected] of Object.entries(ops)) {
+      if (op === 'not') {
+        matched &&= actual !== expected;
+      } else if (op === 'in') {
+        matched &&= Array.isArray(expected) && expected.includes(actual);
+      } else if (op === 'notIn') {
+        matched &&= Array.isArray(expected) && !expected.includes(actual);
+      } else if (op === 'gte') {
+        matched &&= toComparable(actual) >= toComparable(expected);
+      } else if (op === 'gt') {
+        matched &&= toComparable(actual) > toComparable(expected);
+      } else if (op === 'lte') {
+        matched &&= toComparable(actual) <= toComparable(expected);
+      } else if (op === 'lt') {
+        matched &&= toComparable(actual) < toComparable(expected);
+      } else if (op === 'equals') {
+        matched &&= actual === expected;
+      } else if (op === 'contains') {
+        matched &&= String(actual).includes(String(expected));
+      }
+    }
+    return matched;
+  }
+  return actual === filter;
+}
+
+function toComparable(value: unknown): number | string | Date {
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const asNum = Number(value);
+    if (!Number.isNaN(asNum)) return asNum;
+    const asDate = new Date(value);
+    if (!Number.isNaN(asDate.getTime())) return asDate.getTime();
+    return value;
+  }
+  return String(value ?? '');
+}
+
+function matchesWhere(row: Record<string, unknown>, where: Record<string, unknown>): boolean {
+  for (const [field, filter] of Object.entries(where)) {
+    if (filter && typeof filter === 'object' && !(filter instanceof Date) && ('AND' in filter || 'OR' in filter)) {
+      const logical = filter as Record<string, unknown[]>;
+      if (Array.isArray(logical.AND) && !logical.AND.every((cond) => matchesWhere(row, cond as Record<string, unknown>))) {
+        return false;
+      }
+      if (Array.isArray(logical.OR) && !logical.OR.some((cond) => matchesWhere(row, cond as Record<string, unknown>))) {
+        return false;
+      }
+      continue;
+    }
+    if (!matchesFieldFilter(row[field], filter)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // ---------------------------------------------------------------------------
 // Mock delegate implementations — Prisma model delegate의
 // 사용되는 메서드만 구현하며, 나머지 메서드가 있는 Prisma 타입으로는
@@ -243,7 +306,12 @@ let mockOrderIdCounter = 1;
 
 const mockOrder = {
   create: async (args: { data: Record<string, unknown> }) => {
-    const order = { id: `mock-order-${mockOrderIdCounter++}`, ...args.data, createdAt: new Date(), updatedAt: new Date() };
+    const order = {
+      id: `mock-order-${mockOrderIdCounter++}`,
+      ...args.data,
+      createdAt: (args.data.createdAt as Date) ?? new Date(),
+      updatedAt: (args.data.updatedAt as Date) ?? new Date(),
+    };
     mockOrderData.push(order);
     return order;
   },
@@ -262,6 +330,23 @@ const mockOrder = {
     return null;
   },
   count: async (_args?: Record<string, unknown>) => mockOrderData.length,
+  aggregate: async (args?: {
+    where?: Record<string, unknown>;
+    _sum?: Record<string, boolean>;
+    _count?: boolean;
+  }) => {
+    const filtered = (args?.where ? mockOrderData.filter((o) => matchesWhere(o, args!.where!)) : mockOrderData) as Array<
+      Record<string, unknown>
+    >;
+    let sum: Record<string, number> = {};
+    if (args?._sum) {
+      sum = {};
+      for (const field of Object.keys(args._sum)) {
+        sum[field] = filtered.reduce((acc, o) => acc + (Number(o[field]) || 0), 0);
+      }
+    }
+    return { _sum: sum, _count: filtered.length };
+  },
 };
 
 const mockOrderItem = {

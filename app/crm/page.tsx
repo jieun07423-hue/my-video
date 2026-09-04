@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
+import { useStore } from '@/lib/store-context';
 import { Users, Phone, Calendar, Clock, Star, TrendingUp, Search, Plus, UserPlus } from 'lucide-react';
 
 interface Customer {
@@ -17,8 +18,6 @@ interface Customer {
   createdAt: string;
 }
 
-const STORE_ID = 'store_1';
-
 function isBirthdayThisWeek(birthday: string | null): boolean {
   if (!birthday) return false;
   const today = new Date();
@@ -28,6 +27,7 @@ function isBirthdayThisWeek(birthday: string | null): boolean {
 }
 
 export default function CrmPage() {
+  const { currentStore } = useStore();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -35,8 +35,12 @@ export default function CrmPage() {
   const [form, setForm] = useState({ name: '', phone: '', notes: '', birthday: '' });
 
   const fetchCustomers = async () => {
+    if (!currentStore) {
+      setLoading(false);
+      return;
+    }
     try {
-      const res = await fetch(`/api/customers?storeId=${STORE_ID}`);
+      const res = await fetch(`/api/customers?storeId=${currentStore.id}`);
       const json = await res.json();
       if (json.success) setCustomers(json.data);
     } finally {
@@ -44,14 +48,14 @@ export default function CrmPage() {
     }
   };
 
-  useEffect(() => { fetchCustomers(); }, []);
+  useEffect(() => { fetchCustomers(); }, [currentStore?.id]);
 
   const handleAdd = async () => {
-    if (!form.name || !form.phone) return;
+    if (!form.name || !form.phone || !currentStore) return;
     await fetch('/api/customers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ storeId: STORE_ID, ...form, birthday: form.birthday || null }),
+      body: JSON.stringify({ storeId: currentStore.id, ...form, birthday: form.birthday || null }),
     });
     setForm({ name: '', phone: '', notes: '', birthday: '' });
     setShowForm(false);

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
+import { useStore } from '@/lib/store-context';
 import {
   Sun, TrendingUp, Users, ShoppingBag, QrCode, Star,
   ArrowRight, ChevronRight, Calendar, Clock, Bell
@@ -22,23 +23,29 @@ interface SummaryData {
 }
 
 export default function SummaryPage() {
+  const { currentStore } = useStore();
   const [data, setData] = useState<SummaryData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!currentStore) return;
+    setLoading(true);
+    const storeId = currentStore.id;
     const fetchAll = async () => {
       try {
-        const [custRes, menuRes, qrRes, adRes] = await Promise.all([
-          fetch('/api/customers?storeId=store_1'),
-          fetch('/api/menus?storeId=store_1'),
+        const [custRes, menuRes, qrRes, adRes, summaryRes] = await Promise.all([
+          fetch(`/api/customers?storeId=${storeId}`),
+          fetch(`/api/menus?storeId=${storeId}`),
           fetch('/api/qrcodes'),
           fetch('/api/ad'),
+          fetch(`/api/summary?storeId=${storeId}`),
         ]);
 
         const customers = custRes.ok ? (await custRes.json()).data || [] : [];
         const menus = menuRes.ok ? (await menuRes.json()).data || [] : [];
         const qrCodes = qrRes.ok ? (await qrRes.json()).data || [] : [];
         const campaigns = adRes.ok ? (await adRes.json()).items || [] : [];
+        const summary = summaryRes.ok ? (await summaryRes.json()).data || {} : {};
 
         const todayStr = new Date().toDateString();
         const todayVisits = customers.filter((c: { lastVisit: string }) =>
@@ -55,22 +62,23 @@ export default function SummaryPage() {
 
         setData({
           todayVisits,
-          todayRevenue: Math.floor(Math.random() * 500000) + 100000,
-          revenueChange: Math.floor(Math.random() * 20) - 5,
+          todayRevenue: summary.todayRevenue ?? 0,
+          revenueChange: summary.revenueChange ?? 0,
           totalCustomers: customers.length,
           totalMenus: menus.length,
           soldOutMenus: menus.filter((m: { isAvailable: boolean }) => !m.isAvailable).length,
           birthdayCustomers: customers.filter((c: { birthday: string | null }) => isBirthdayThisWeek(c.birthday)).length,
           totalScans: qrCodes.reduce((s: number, q: { scanCount: number }) => s + (q.scanCount || 0), 0),
           activeCampaigns: campaigns.filter((c: { status: string }) => c.status === 'generating').length,
-          recentOrders: Math.floor(Math.random() * 20) + 3,
+          recentOrders: summary.recentOrders ?? 0,
         });
       } finally {
         setLoading(false);
       }
     };
     fetchAll();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStore?.id]);
 
   const today = new Date();
   const dateStr = `${today.getFullYear()}.${today.getMonth() + 1}.${today.getDate()} (${['일', '월', '화', '수', '목', '금', '토'][today.getDay()]})`;

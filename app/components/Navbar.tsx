@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ReactNode, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import NotificationBell from '@/components/notifications/NotificationBell';
+import StoreSelect from '@/components/StoreSelect';
 
 export default function Navbar({ children }: { children?: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -53,7 +54,8 @@ export default function Navbar({ children }: { children?: React.ReactNode }) {
             <NavLink href="/genie">🧞 지니</NavLink>
             <NavLink href="/admin">어드민</NavLink>
             <NavLink href="/notes/deleted">삭제된 노트</NavLink>
-            <div className="ml-2">
+            <div className="ml-2 flex items-center gap-2">
+              <StoreSelect />
               <NotificationBell />
             </div>
           </div>
@@ -81,6 +83,9 @@ export default function Navbar({ children }: { children?: React.ReactNode }) {
           }`}
         >
           <div className="py-4 space-y-1 border-t" style={{ borderColor: '#2d2d4a' }}>
+            <div className="px-4 pb-2">
+              <StoreSelect />
+            </div>
             <MobileNavLink href="/" onClick={() => setIsMobileMenuOpen(false)}>
               홈
             </MobileNavLink>
