@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from '@/components/ui/core/Button';
 import { Badge, StatusBadge } from '@/components/ui/core/Badge';
 import { StatCard } from '@/components/ui/StatCard';
+import { DesignMDMetricsBanner } from '@/components/design-md/DesignMDMetricsBanner';
 import TrendChart from '@/components/dashboard/TrendChart';
 import IndustryChart from '@/components/dashboard/IndustryChart';
 import { Progress } from '@/components/ui/core/Progress';
@@ -358,6 +359,9 @@ export default function DashboardPage() {
                 </div>
               </section>
             )}
+
+            {/* DESIGN.md 스타일 메트릭스 배너 */}
+            {metrics && <DesignMDMetricsBanner metrics={metrics} />}
 
             {/* 트렌드 차트 */}
             {trends && (

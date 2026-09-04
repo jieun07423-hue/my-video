@@ -1,7 +1,11 @@
 :root {
   --background: #1a1a2e;
   --foreground: #ffffff;
-  --primary: #4a90d9;
+
+--canvas: #fdfcfc;
+--ink: #201d1d;
+--mute: #646262;
+--primary: #4a90d9;
   --secondary: #16213e;
   --accent: #e94560;
   --card-bg: #16213e;
